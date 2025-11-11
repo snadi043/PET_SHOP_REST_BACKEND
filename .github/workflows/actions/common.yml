@@ -1,0 +1,17 @@
+name: 'Custom Reusable Action.'
+description: 'Reusable action for fetching the code and installing the dependencies.'
+runs-on:
+  using: 'composite'
+  steps:
+  - name: 'Get the code to install it on the servers individually for every job.'
+    uses: 'actions/checkout@v5'
+    with:
+      sparse-checkout: |
+        .github
+        src
+  - name: 'Install Node to setup the environment'
+    uses: actions/setup-node@v6
+    with:
+      node-version: 24
+  - name: 'Install all the dependencies needed for the project.'
+    run: npm ci

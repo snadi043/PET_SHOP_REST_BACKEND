@@ -1,0 +1,24 @@
+name: 'Pet Shop Workflow'
+on: 'workflow_dispatch'
+jobs:
+  test:
+    runs-on: ['ubuntu-latest', 'macos-latest']
+    steps:
+      - name: 'Resuing the custom action to setup the code and install dependencies.'
+        uses: './actions/common.yml'
+      - name: 'Run the tests.'
+        run: npm run test
+  build:
+    needs: test
+    runs-on: ['ubuntu-lates', 'macos-lates']
+    steps:
+      - name: 'Resuing the custom action to setup the code and install dependencies.'
+        uses: './actions/common.yml'
+      - name: Build the application.
+        run: npm build
+  deploy:
+    needs: build
+    runs-on: ['ubuntu-lates', 'macos-latest']
+    steps:
+      - name: 'Resuing the custom action to setup the code and install dependencies.'
+        uses: './actions/common.yml'
