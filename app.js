@@ -12,8 +12,8 @@ const bodyParser = require('body-parser');
 const errorController = require('./controllers/error');
 
 // Importing all the routes in the application to register in the app.js file so that routing happens in an organized manner. 
-const adminProductRoutes = require('./routes/add-products');
-const shopRoutes = require('./routes/shop');
+const adminProductRoutes = require('./routes/admin/admin-products');
+const shopRoutes = require('./routes/shop/shop');
 
 // Configuring the application to use express.
 const app = express();

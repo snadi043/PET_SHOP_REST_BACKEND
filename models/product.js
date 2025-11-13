@@ -5,8 +5,11 @@ const fs = require('fs');
 const path = require('path');
 
 module.exports = class Product{
-    constructor(prodTitle){
+    constructor(prodTitle, prodImageUrl, prodPrice, prodDescription){
         this.title = prodTitle;
+        this.imageUrl = prodImageUrl;
+        this.price = prodPrice;
+        this.description = prodDescription
     }
 
     // This is the method to save the product information into a file by using the "fs" package.
@@ -34,7 +37,7 @@ module.exports = class Product{
             if(err){
                 cb([]);
             }
-            cb(JSON.parse(fileContent));
+            // cb(JSON.parse(fileContent));
         });
     }
 }
