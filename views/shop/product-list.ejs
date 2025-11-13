@@ -1,8 +1,8 @@
-<%- include('includes/header.ejs') %>
+<%- include('../includes/header.ejs') %>
 
 <link rel="stylesheet" href="/css/product.css"/>
 
-<%- include('includes/navbar.ejs') %>
+<%- include('../includes/navbar.ejs') %>
 
 <body>
     <main>
@@ -16,21 +16,22 @@
                             </h1>
                         </header>
                         <div class="card__image">
-                            <img src="https://s7d2.scene7.com/is/image/PetSmart/5339222?fmt=webp&wid=2800&hei=2800" alt="<%= product.title %>">
+                            <img src="<%= product.imageUrl" alt="<%= product.title %>">
                         </div>
                         <div class="card__content">
                             <h2 class="product__price">
-                                $ 19.99<!-- $<%= product.prod_price %> -->
+                                $<%= product.prod_price %>
                             </h2>
                             <p class="product__description">
-                                <!-- <%= product.prod_description %> -->
-                                Hill's Science Diet Perfect Weight Adult Dry Dog Food - Chicken
+                                <%= product.prod_description %>
                             </p>
                         </div>
                         <div class="card__actions">
                             <!-- Adding a new link under with the button class to handle the details information of the product
                             by injecting the id of the product dynamically using ejs template. -->
-                            <a class="btn" href="">Add to cart</a>  
+                            <form method="POST" action="/add-to-cart">
+                                <button type="submit" class="btn">Add to cart</a>  
+                            </form>
 
                             <!-- Importing the common code block for the "Add-to-cart" button view from the includes.
                             Since, the product in the for loop in the line 11 is local value with in the loop it is 
@@ -45,4 +46,4 @@
             <% } %>
     </main>
     
-<%- include('includes/footer.ejs') %>
+<%- include('../includes/footer.ejs') %>

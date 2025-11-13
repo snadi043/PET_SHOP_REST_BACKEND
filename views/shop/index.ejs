@@ -1,0 +1,49 @@
+<%- include('../includes/header.ejs') %>
+
+<link rel="stylesheet" href="/css/product.css"/>
+
+<%- include('../includes/navbar.ejs') %>
+
+<body>
+    <main>
+        <% if(prods.length > 0) { %>
+            <% for (let product of prods) { %>
+                <div class="grid">
+                    <article class="card product-item">
+                        <header class="card__header">
+                            <h1 class="product__title">
+                                <%= product.title %>
+                            </h1>
+                        </header>
+                        <div class="card__image">
+                            <img src="<%= product.imageUrl" alt="<%= product.title %>">
+                        </div>
+                        <div class="card__content">
+                            <h2 class="product__price">
+                                $<%= product.prod_price %>
+                            </h2>
+                            <p class="product__description">
+                                <%= product.prod_description %>
+                            </p>
+                        </div>
+                        <div class="card__actions">
+                            <!-- Adding a new link under with the button class to handle the details information of the product
+                            by injecting the id of the product dynamically using ejs template. -->
+                            <form method="POST" action="/cart">
+                                <button type="submit" class="btn" href="/cart">Add to cart</a>  
+                            </form>
+
+                            <!-- Importing the common code block for the "Add-to-cart" button view from the includes.
+                            Since, the product in the for loop in the line 11 is local value with in the loop it is 
+                            not accessible outside of it like in the line 33 for includes to get the product.id, so 
+                            we have to add the property seperately into the include section.  -->
+                        </div>
+                    </article>
+                </div>
+            <% } %>
+            <% } else { %>
+                <h1>No Products Found.</h1>
+            <% } %>
+    </main>
+    
+<%- include('../includes/footer.ejs') %>
