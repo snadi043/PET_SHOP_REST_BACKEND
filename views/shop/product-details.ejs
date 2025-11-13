@@ -2,8 +2,17 @@
 
 <%- include('../includes/navbar.ejs') %>
     <body>
-        <main>
-            <h1>Product Details Page.</h1>
+        <main class="centered">
+            <h1><%= product.title %></h1>
+            <hr>
+            <div>
+                <img src="<%= product.imageUrl %>" width="400px" height="400px" alt="<%= product.title %>"/>
+            </div>
+                <h1>$<%= product.price %></h1>
+                <h2><%= product.description %></h2>
+            <form method="POST" action="/cart">
+                <button class="btn" type="submit">Add to cart</button>
+            </form>
         </main>
 
 <%- include('../includes/footer.ejs') %>

@@ -4,6 +4,24 @@ const fs = require('fs');
 // Importing the "path" package to build dynamic paths useful to access them in the application.
 const path = require('path');
 
+// Utility constant to store the dynamic path;
+const p = path.join(
+  path.dirname(process.mainModule.filename),
+  'data',
+  'products.json'
+);
+
+// Utility function to read the file before performing the save/fetch actions.
+const getProductsFromFile = cb => {
+fs.readFile(p, (err, fileContent) => {
+    if (err) {
+      cb([]);
+    } else {
+      cb(JSON.parse(fileContent));
+    }
+    });
+}
+
 module.exports = class Product{
     constructor(prodTitle, prodImageUrl, prodPrice, prodDescription){
         this.title = prodTitle;
@@ -14,8 +32,9 @@ module.exports = class Product{
 
     // This is the method to save the product information into a file by using the "fs" package.
     save(){
+        // Adding a unique "id" for every product in order to fetch the details of individual product later when needed.
+        this.id = Math.random().toString();
         // Before reading the file we have to get the access to the file which is the path of the file to perform read/write actions.
-        const p = path.join(path.dirname(process.mainModule.filename), 'data', 'products.json');
         // In order to save the data to a file first the file is to be created and checked if any information is present in that file.
         fs.readFile(p, (err, fileContent) => {
             let products = [];
@@ -32,12 +51,14 @@ module.exports = class Product{
     // This method is made static so that none of the inherited classes from this class have access to modify this method.
     static fetchAll(cb){
         // In order to fetch from a file we have to get the access to the file by pointing to the directory using path;
-        const p = path.join(path.dirname(process.mainModule.filename), 'data', 'products.json');
-        fs.readFile(p, (err, fileContent) => {
-            if(err){
-                return cb([]);
-            }
-            return cb(JSON.parse(fileContent));
+        getProductsFromFile(cb);
+    }
+
+    static fetchProductById(id, cb){
+        getProductsFromFile(products => {
+            console.log(products);
+            const product = products.find(p => p.id === id);
+            cb(product);
         });
     }
 }
