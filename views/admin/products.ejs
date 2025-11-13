@@ -16,14 +16,14 @@
                             </h1>
                         </header>
                         <div class="card__image">
-                            <img src="<%= product.imageUrl" alt="<%= product.title %>">
+                            <img src="<%= product.imageUrl%>" alt="<%= product.title %>">
                         </div>
                         <div class="card__content">
                             <h2 class="product__price">
-                                $<%= product.prod_price %>
+                                $<%= product.price %>
                             </h2>
                             <p class="product__description">
-                                <%= product.prod_description %>
+                                <%= product.description %>
                             </p>
                         </div>
                         <div class="card__actions">
@@ -31,7 +31,7 @@
                             by injecting the id of the product dynamically using ejs template. -->
                             <a href="/admin/edit-product">Edit</a>
                             <form method="POST" action="/admin/delete-product">
-                                <button type="submit" class="btn" href="/admin/delete-product">Add to cart</a>  
+                                <button type="submit" class="btn" href="/admin/delete-product">Add to cart</button>  
                             </form>
 
                             <!-- Importing the common code block for the "Add-to-cart" button view from the includes.
