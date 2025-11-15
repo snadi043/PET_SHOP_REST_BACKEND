@@ -13,9 +13,10 @@ exports.getProducts = (req, res, next) => {
 
 // This is the middleware function which gets triggered when the "get" method for adding the products path is requested on the server.
 exports.getAddProducts = (req, res, next) => {
-    res.render('admin/add-product', {
-        path: '/admin/add-products',
-        docTitle: 'Products Page',
+    res.render('admin/edit-product', {
+        path: '/admin/add-product',
+        docTitle: 'Add Product Page',
+        editing: false
     });
 }
 
@@ -33,9 +34,24 @@ exports.postAddProducts = (req, res, next) => {
 
 // This is the middleware function which gets triggered when the "get" method for editing the products path is requested on the server.
 exports.getEditProduct = (req, res, next) => {
-    res.render('admin/edit-product', {
-        docTitle: 'Edit Product Page',
-        path: '/admin/edit-product'
+    const editMode = req.query.edit; // edit is the key on the query which holds the boolean value and this provision is given by node to pass information about a particular item in the application to use else where.
+    // In order to edit a unique product it is to be determined by the id of the product which can be evaluated by using the Product model
+    const productId = req.params.productId; // productId is passed as params from inside of the form.
+    // This is the condition if the query parameter is not present, then redirect to index page.
+    if(!editMode){
+        return res.redirect('/');
+    }
+    // Condition to handle if the "entered id" is not an valid id attached to the product then return to the index page.
+    Product.fetchProductById(productId, (product) => {
+        if(!product){
+            return res.render('/');
+        }
+        res.render('admin/edit-product', {
+            docTitle: 'Edit Product Page',
+            path: '/admin/edit-product',
+            editing: editMode, // now this meta data can be accessed on the view template to dynamically alter the view based on the "editing" parameter value.
+            product: product,
+        });
     });
 }
 
