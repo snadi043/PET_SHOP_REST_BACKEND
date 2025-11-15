@@ -53,6 +53,7 @@ exports.getCart = (req, res, next) => {
 exports.postCart = (req, res, next) => {
     const prodId = req.body.productId;
     console.log(prodId);
+    res.redirect('/cart');
 }
 
 // This is the middleware function which gets triggered when the "get" method for rendering the checkout view requested on the server.
