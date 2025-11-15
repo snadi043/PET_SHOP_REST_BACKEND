@@ -1,5 +1,7 @@
 const Product = require('../../models/product');
 
+const Cart = require('../../models/cart');
+
 // This is the middleware function which gets triggered when the "get" method for fetching all the products requested on the server.
 exports.getProducts = (req, res, next) => {
     Product.fetchAll(products => {
@@ -52,7 +54,10 @@ exports.getCart = (req, res, next) => {
 
 exports.postCart = (req, res, next) => {
     const prodId = req.body.productId;
-    console.log(prodId);
+    // Instead of logging the productId here the idea is to store the product details to the cart.
+    Product.fetchProductById(prodId, (product) => {
+        Cart.addToCart(prodId, product.price);
+    })
     res.redirect('/cart');
 }
 
