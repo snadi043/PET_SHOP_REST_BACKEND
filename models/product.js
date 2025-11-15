@@ -23,28 +23,36 @@ fs.readFile(p, (err, fileContent) => {
 }
 
 module.exports = class Product{
-    constructor(prodTitle, prodImageUrl, prodPrice, prodDescription){
+    constructor(prodId, prodTitle, prodImageUrl, prodPrice, prodDescription){
+        this.id = prodId;
         this.title = prodTitle;
         this.imageUrl = prodImageUrl;
         this.price = prodPrice;
         this.description = prodDescription
     }
-
     // This is the method to save the product information into a file by using the "fs" package.
     save(){
-        // Adding a unique "id" for every product in order to fetch the details of individual product later when needed.
-        this.id = Math.random().toString();
-        // Before reading the file we have to get the access to the file which is the path of the file to perform read/write actions.
-        // In order to save the data to a file first the file is to be created and checked if any information is present in that file.
-        fs.readFile(p, (err, fileContent) => {
-            let products = [];
-            if(!err){
-                products = JSON.parse(fileContent);
+        // If id already exists for a product then it has to be updated.
+        // To update the product use the fetchProductById method and find the index of the updatedProduct and replace that product.
+        getProductsFromFile(products => {
+            if(this.id){
+                const existingProductIndex = products.findIndex(prod => prod.id === this.id);
+                const updatedProducts = [...products];
+                updatedProducts[existingProductIndex] = this;
+                fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
+                    consolr.log(err);
+                });
             }
-            products.push(this);
-            fs.writeFile(p, JSON.stringify(products), (err) => {
-                console.log(err);
-            });
+            else{
+                // Adding a unique "id" for every product in order to fetch the details of individual product later when needed.
+                this.id = Math.random().toString();
+                // Before reading the file we have to get the access to the file which is the path of the file to perform read/write actions.
+                // In order to save the data to a file first the file is to be created and checked if any information is present in that file.
+                products.push(this);
+                fs.writeFile(p, JSON.stringify(products), (err) => {
+                    console.log(err);
+                });
+            }
         });
     }
     // This is the method to fetch all the product information.
@@ -56,7 +64,6 @@ module.exports = class Product{
 
     static fetchProductById(id, cb){
         getProductsFromFile(products => {
-            console.log(products);
             const product = products.find(p => p.id === id);
             cb(product);
         });

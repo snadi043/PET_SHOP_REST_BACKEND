@@ -14,7 +14,7 @@ exports.getProducts = (req, res, next) => {
 // This is the middleware function which gets triggered when the "get" method for adding the products path is requested on the server.
 exports.getAddProducts = (req, res, next) => {
     res.render('admin/edit-product', {
-        path: '/admin/add-product',
+        path: '/admin/add-products',
         docTitle: 'Add Product Page',
         editing: false
     });
@@ -26,8 +26,7 @@ exports.postAddProducts = (req, res, next) => {
     const imageUrl = req.body.prod_imageUrl;
     const price = req.body.prod_price;
     const description = req.body.prod_description;
-
-    const product = new Product(title, imageUrl, price, description);
+    const product = new Product(null, title, imageUrl, price, description);
     product.save();
     res.redirect('/');
 };
@@ -57,7 +56,14 @@ exports.getEditProduct = (req, res, next) => {
 
 // This is the middleware function which gets triggered when the "post" method for editing the products path is requested on the server.
 exports.postEditProduct = (req, res, next) => {
-    res.redirect('/admin/add-products');
+    const prodId = req.body.productId;
+    const updatedTitle = req.body.prod_title;
+    const updatedImageUrl = req.body.prod_imageUrl;
+    const updatedPrice = req.body.prod_price;
+    const updatedDescription = req.body.prod_description;
+    const updatedProduct = new Product(prodId, updatedTitle, updatedImageUrl, updatedPrice, updatedDescription);
+    updatedProduct.save();
+    res.redirect('/admin/products');
 }
 
 // This is the middleware function which gets triggered when the "post" method for deleting the products path is requested on the server.
