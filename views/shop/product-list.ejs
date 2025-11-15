@@ -30,9 +30,7 @@
                             <!-- Adding a new link under with the button class to handle the details information of the product
                             by injecting the id of the product dynamically using ejs template. -->
                             <a class="btn" href="/products/<%= product.id %>" >Details</a> 
-                            <form method="POST" action="/add-to-cart">
-                                <button class="btn" type="submit">Add to cart</button>
-                            </form>
+                            <%- include('../includes/add-to-cart.ejs', {product: product}) %>
 
                             <!-- Importing the common code block for the "Add-to-cart" button view from the includes.
                             Since, the product in the for loop in the line 11 is local value with in the loop it is 

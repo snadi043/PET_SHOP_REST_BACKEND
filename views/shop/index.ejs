@@ -29,9 +29,9 @@
                         <div class="card__actions">
                             <!-- Adding a new link under with the button class to handle the details information of the product
                             by injecting the id of the product dynamically using ejs template. -->
-                            <form method="POST" action="/cart">
-                                <button type="submit" class="btn" href="/cart">Add to cart</button>  
-                            </form>
+                            
+                            <!-- When using the includes with ejs the data that has to passed to the template cannot be accessed directly. So, additionally it has to be passed to the template as an object. -->
+                            <%- include('../includes/add-to-cart.ejs', {product: product}) %>
 
                             <!-- Importing the common code block for the "Add-to-cart" button view from the includes.
                             Since, the product in the for loop in the line 11 is local value with in the loop it is 
