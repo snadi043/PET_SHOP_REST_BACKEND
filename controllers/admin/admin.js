@@ -68,8 +68,8 @@ exports.postEditProduct = (req, res, next) => {
 
 // This is the middleware function which gets triggered when the "post" method for deleting the products path is requested on the server.
 exports.postDeleteProduct = (req, res, next) => {
-    res.render('admin/products', {
-        path: '/admin/delete-products',
-        docTitle: 'Delete Product Page'
-    });
+    // Since delete is a POST method, the productId can be made accessible by using the input hidden type on the template body.
+    const prodId = req.body.productId;
+    Product.deleteProduct(prodId);
+    res.redirect('/admin/products');
 }

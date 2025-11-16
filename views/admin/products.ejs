@@ -30,7 +30,10 @@
                             <!-- Adding a new link under with the button class to handle the details information of the product
                             by injecting the id of the product dynamically using ejs template. -->
                             <a class="btn" href="/admin/edit-product/<%= product.id %>?edit=true">Edit</a>
-                            <a class="btn" href="/admin/delete-product">Delete</a>
+                            <form method="POST" action="/admin/delete-product">
+                                <input type="hidden" value="<%= product.id %>" name="productId"/>
+                                <button type="submit" class="btn">Delete</a>
+                            </form>
                             <!-- Importing the common code block for the "Add-to-cart" button view from the includes.
                             Since, the product in the for loop in the line 11 is local value with in the loop it is 
                             not accessible outside of it like in the line 33 for includes to get the product.id, so 

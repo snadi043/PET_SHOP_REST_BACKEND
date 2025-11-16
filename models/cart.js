@@ -41,4 +41,29 @@ module.exports = class Cart{
             });
         });
     }
+
+    // Delete product from the cart is the static function that has to be able to remove the product along with the removal of respective
+    // quantity from the cart and also the price assigned to the products. 
+
+    // To delete a particular product from the cart again it is required to access the id.
+    static deleteProductFromCart(id, productPrice){
+        // In order to get the access to the id, the fileSystem has to be accessed.
+        fs.readFile(p, (err, fileContent) => {
+            // If there is an error in reading the file just return.
+            if(err){
+                return;
+            }
+            const updatedCart = {...JSON.parse(fileContent)};
+            const product = updatedCart.products.find(prod => prod.id === id);
+            if(!product){
+                return;
+            }
+            const productQty = product.qty;
+            updatedCart.products = updatedCart.products.find(p => p.id === id);
+            updatedCart.totalPrice = updatedCart.totalPrice - productPrice * productQty;
+            fs.writeFile(p, (JSON.stringify(updatedCart)), (err) => {
+                console.log(err);
+            });
+        });
+    }
 }

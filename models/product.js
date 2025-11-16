@@ -4,6 +4,9 @@ const fs = require('fs');
 // Importing the "path" package to build dynamic paths useful to access them in the application.
 const path = require('path');
 
+// Importing the Cart Model to access it in the Product model to use it to remove the product from the Product class when deleting it.
+const Cart = require('../models/cart');
+
 // Utility constant to store the dynamic path;
 const p = path.join(
   path.dirname(process.mainModule.filename),
@@ -55,6 +58,28 @@ module.exports = class Product{
             }
         });
     }
+
+    // The Delete static function is designed to remove the products from the Products class, update the products class and then save it back to the file system.
+    // So, since it is not viable to delete whole product-list it is a good idea to delete product based on the id.
+    static deleteProduct(id){
+        // Checking the condition where is id not avaialbe on the product for whatever reason just return.
+        if(!id){
+            return;
+        }
+        // If the id is assigned then the first step is to read the products from the file which can be done by the utility function.
+        getProductsFromFile(products => {
+            const product = products.find(prod => prod.id === id);
+            const updatedProducts = products.filter(p => p.id !== this.id);
+            fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
+                // Once the product is efficiently deleted from the product-list, then it is appropriate to remove the item from the cart as well, if the item is present in the cart.
+                if(!err){
+                    Cart.deleteProductFromCart(id, product.price);
+                }
+                console.log(err);
+            });
+        });
+
+    } 
     // This is the method to fetch all the product information.
     // This method is made static so that none of the inherited classes from this class have access to modify this method.
     static fetchAll(cb){
