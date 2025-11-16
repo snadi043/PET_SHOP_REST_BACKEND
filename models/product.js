@@ -16,12 +16,12 @@ const p = path.join(
 
 // Utility function to read the file before performing the save/fetch actions.
 const getProductsFromFile = cb => {
-fs.readFile(p, (err, fileContent) => {
-    if (err) {
-      cb([]);
-    } else {
-      cb(JSON.parse(fileContent));
-    }
+    fs.readFile(p, (err, fileContent) => {
+        if (err) {
+            cb([]);
+        } else {
+            cb(JSON.parse(fileContent));
+        }
     });
 }
 
@@ -31,7 +31,7 @@ module.exports = class Product{
         this.title = prodTitle;
         this.imageUrl = prodImageUrl;
         this.price = prodPrice;
-        this.description = prodDescription
+        this.description = prodDescription;
     }
     // This is the method to save the product information into a file by using the "fs" package.
     save(){
@@ -43,7 +43,9 @@ module.exports = class Product{
                 const updatedProducts = [...products];
                 updatedProducts[existingProductIndex] = this;
                 fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
-                    consolr.log(err);
+                    if(err) {
+                        console.error('Error updating product:', err);
+                    }
                 });
             }
             else{
@@ -53,7 +55,9 @@ module.exports = class Product{
                 // In order to save the data to a file first the file is to be created and checked if any information is present in that file.
                 products.push(this);
                 fs.writeFile(p, JSON.stringify(products), (err) => {
-                    console.log(err);
+                    if(err) {
+                        console.error('Error saving product:', err);
+                    }
                 });
             }
         });
@@ -69,13 +73,15 @@ module.exports = class Product{
         // If the id is assigned then the first step is to read the products from the file which can be done by the utility function.
         getProductsFromFile(products => {
             const product = products.find(prod => prod.id === id);
-            const updatedProducts = products.filter(p => p.id !== this.id);
+            const updatedProducts = products.filter(p => p.id !== id);
             fs.writeFile(p, JSON.stringify(updatedProducts), (err) => {
                 // Once the product is efficiently deleted from the product-list, then it is appropriate to remove the item from the cart as well, if the item is present in the cart.
-                if(!err){
+                if(!err && product){
                     Cart.deleteProductFromCart(id, product.price);
                 }
-                console.log(err);
+                if(err) {
+                    console.error('Error deleting product:', err);
+                }
             });
         });
 

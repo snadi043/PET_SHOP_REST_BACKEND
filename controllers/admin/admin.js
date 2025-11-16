@@ -43,7 +43,7 @@ exports.getEditProduct = (req, res, next) => {
     // Condition to handle if the "entered id" is not an valid id attached to the product then return to the index page.
     Product.fetchProductById(productId, (product) => {
         if(!product){
-            return res.render('/');
+            return res.redirect('/');
         }
         res.render('admin/edit-product', {
             docTitle: 'Edit Product Page',

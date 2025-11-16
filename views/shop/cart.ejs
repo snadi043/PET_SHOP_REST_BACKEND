@@ -2,6 +2,22 @@
 
 <%- include('../includes/navbar.ejs') %>
     <body>
-        <h1>Cart Page.</h1>
+        <main>
+            <% if(products.length > 0) { %>
+                <ul>
+                    <% products.forEach((prodData) => { %>
+                        <li>
+                            <%= prodData.productData.title %> - (<%= prodData.productData.price %>)
+                            <form method="POST" action="/cart-delete-product">
+                                <input type="hidden" value="<%= prodData.productData.id %>" name="productId" />
+                                <button type="submit" class="btn">Delete</button>
+                            </form>
+                        </li>
+                    <% }); %>
+                </ul>
+                <% } else { %>
+                    <h1>No Products found in the Cart.</h1>
+            <% } %>
+        </main>
         
 <%- include('../includes/footer.ejs') %>

@@ -46,9 +46,21 @@ exports.getOrders = (req, res, next) => {
 
 // This is the middleware function which gets triggered when the "get" method for rendering the cart view requested on the server.
 exports.getCart = (req, res, next) => {
-    res.render('shop/cart', {
-        docTitle: 'Cart Page',
-        path: '/cart'
+    Cart.fetchCart(cart => {
+        Product.fetchAll(product => {
+            const cartProducts = [];
+            for(const prod of product){
+                const cartProductData = cart.products.find(p => p.id === prod.id);
+                if(cartProductData){
+                    cartProducts.push({productData: prod, qty: cartProductData.qty});
+                }
+            }
+            res.render('shop/cart', {
+                docTitle: 'Cart Page',
+                path: '/cart',
+                products: cartProducts
+            });
+        });
     });
 }
 
@@ -61,6 +73,13 @@ exports.postCart = (req, res, next) => {
     res.redirect('/cart');
 }
 
+exports.postDeleteProductFromCart = (req, res, next) => {
+    const prodId = req.body.productId;
+    Product.fetchProductById(prodId, products => {
+        Cart.deleteProductFromCart(prodId, products.price);
+        res.redirect('/cart');
+    });
+}
 // This is the middleware function which gets triggered when the "get" method for rendering the checkout view requested on the server.
 exports.getCheckout = (req, res, next) => {
     res.render('shop/checkout', {

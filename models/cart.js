@@ -9,7 +9,7 @@ const p = path.join(path.dirname(process.mainModule.filename), 'data', 'cart.jso
 module.exports = class Cart{
     static addToCart(id, productPrice){
         fs.readFile(p, (err, fileContent) => {
-            let cart = {product: [], totalPrice: 0};
+            let cart = {products: [], totalPrice: 0};
             // If there is no error in reading the file then configuring to parse the data from the file which is expected to be in JSON format.
             if(!err){
                 cart = { ...JSON.parse(fileContent)};
@@ -18,26 +18,29 @@ module.exports = class Cart{
             
             // Identifying the product is already in the cart.
             // For this to achieve, an "id" is expected for the product which is already achieved from the addProduct functionality from the "POST" method in the "PRODUCT" model.
-            const existingProductIndex = cart.product.findIndex(p => p.id === id); // the find method return true if the id's are matched, which is how it can be determined that product already exists in the cart.
-            const existingProduct = cart.product[existingProductIndex];
+            const existingProductIndex = cart.products.findIndex(p => p.id === id); // the find method return true if the id's are matched, which is how it can be determined that product already exists in the cart.
+            const existingProduct = cart.products[existingProductIndex];
             let updatedProduct;
             if(existingProduct){
                 // update the product with the quantity by 1.
                 // Also from the line 12, in the cart oject we expect a product array and it must have a quantity which can be accessed by "qty" key.
                 updatedProduct = { ...existingProduct };
-                updatedProduct.qty = updatedProduct.qty + 1;
-                cart.product = [ ...cart.product ];
-                cart.product[existingProductIndex] = updatedProduct;
+                updatedProduct.qty = (updatedProduct.qty || 0) + 1;
+                cart.products = [ ...cart.products ];
+                cart.products[existingProductIndex] = updatedProduct;
             }
             // the else condition is for product which is new to the cart.
             else{
                 updatedProduct = {id: id, qty: 1};
-                cart.product = [ ...cart.product, updatedProduct];
+                cart.products = [ ...cart.products, updatedProduct];
             }
             // Updating the cart after both the cases with totalPrice using the expected productPrice from the Cart class.
-            cart.totalPrice = cart.totalPrice + +productPrice;
+            const validPrice = Math.max(0, parseFloat(productPrice) || 0);
+            cart.totalPrice = cart.totalPrice + validPrice;
             fs.writeFile(p, JSON.stringify(cart), (err) => {
-                console.log(err);
+                if(err) {
+                    console.error('Error updating cart:', err);
+                }
             });
         });
     }
@@ -58,12 +61,28 @@ module.exports = class Cart{
             if(!product){
                 return;
             }
-            const productQty = product.qty;
-            updatedCart.products = updatedCart.products.find(p => p.id === id);
-            updatedCart.totalPrice = updatedCart.totalPrice - productPrice * productQty;
+            const productQty = product.qty || 1;
+            const validPrice = Math.max(0, parseFloat(productPrice) || 0);
+            updatedCart.products = updatedCart.products.filter(p => p.id !== id);
+            updatedCart.totalPrice = Math.max(0, updatedCart.totalPrice - (validPrice * productQty));
             fs.writeFile(p, (JSON.stringify(updatedCart)), (err) => {
-                console.log(err);
+                if(err) {
+                    console.error('Error updating cart after deletion:', err);
+                }
             });
+        });
+    }
+
+    // Fetch the products in the cart to display if the products exists in the cart on the cart template.
+    static fetchCart(cb){
+        fs.readFile(p, (err, fileContent) => {
+            if(err){
+                console.error('Error reading cart file:', err);
+                cb(null);
+            }
+            else{
+                cb(JSON.parse(fileContent)); 
+            }
         });
     }
 }
