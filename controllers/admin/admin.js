@@ -1,14 +1,17 @@
 const Product = require('../../models/product');
 
+const db = require('../../utils/database');
+
 // This is the middleware function which gets triggered when the "get" method for adding the products path is requested on the server.
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
+    Product.fetchAll().then(products => {
+        // console.log('admin.js products:', products);
         res.render('admin/products', {
-        prods: products,
+        prods: products[0],
         path: '/admin/products',
         docTitle: 'Admin Products'
         });  
-    });
+    }).catch(err => {console.log(err)});
 }
 
 // This is the middleware function which gets triggered when the "get" method for adding the products path is requested on the server.
@@ -27,8 +30,9 @@ exports.postAddProducts = (req, res, next) => {
     const price = req.body.prod_price;
     const description = req.body.prod_description;
     const product = new Product(null, title, imageUrl, price, description);
-    product.save();
-    res.redirect('/');
+    product.save().then(() => {
+        res.redirect('/');
+    }).catch(err => {console.log(err)});
 };
 
 // This is the middleware function which gets triggered when the "get" method for editing the products path is requested on the server.
@@ -70,6 +74,7 @@ exports.postEditProduct = (req, res, next) => {
 exports.postDeleteProduct = (req, res, next) => {
     // Since delete is a POST method, the productId can be made accessible by using the input hidden type on the template body.
     const prodId = req.body.productId;
-    Product.deleteProduct(prodId);
-    res.redirect('/admin/products');
+    Product.deleteProduct(prodId).then(() => {
+        res.redirect('/admin/products');
+    }).catch((err) => {console.log(err)});
 }

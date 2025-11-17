@@ -34,9 +34,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({extended: false}));
 
 // This is the middleware function which gets triggered when the index page path is requested on the server.
-app.use('/', (req, res, next) => {
-    res.redirect('/');
-});
+// app.use('/', (req, res, next) => {
+//     res.redirect('/');
+// });
 
 // Congiruing all the routes to be registered with the express framework.
 app.use('/admin', adminProductRoutes);

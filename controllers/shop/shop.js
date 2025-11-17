@@ -4,36 +4,43 @@ const Cart = require('../../models/cart');
 
 // This is the middleware function which gets triggered when the "get" method for fetching all the products requested on the server.
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll(products => {
+    Product.fetchAll().then(products => {
+        // console.log('shop.js, getProducts:', products);
         res.render('shop/product-list', {
-        prods: products,
+        prods: products[0],
         path: '/products',
         docTitle: 'All Products',
         });
-    });
+    }).catch(err => {console.log(err)});
 }
 
 // This is the middleware function which gets triggered when the "get" method for fetching a single product by id requested on the server.
 exports.getProductById = (req, res, next) => {
     const productId = req.params.prodId;
-    Product.fetchProductById(productId, product => {
+    Product.fetchProductById(productId).then(([product]) => {
+        console.log('from getProductById:', product);
         res.render('shop/product-details', {
             docTitle: product.title,
             path: '/products',
-            product: product
+            product: product[0]
         });
+    }).catch((err) => {
+        console.log(err);
     });
 }
 
 // This is the middleware function which gets triggered when the "get" method for rendering the a single product requested on the server.
 exports.getIndexPage = (req, res, next) => {
-    Product.fetchAll(products => {
+    // Since the database methods are based on concepts of promises, here when using them it is expected to use the promise methods
+    // like then() and catch() through which chaining can be made easy and readable.
+    Product.fetchAll().then((products) => {
+        // console.log('products:', products);
         res.render('shop/index', {
-        prods: products,
+        prods: products[0],
         path: '/',
         docTitle: 'Shop Page',
         });
-    });
+    }).catch(err => {console.log(err)});
 }
 
 // This is the middleware function which gets triggered when the "get" method for fetching the Orders requested on the server.
