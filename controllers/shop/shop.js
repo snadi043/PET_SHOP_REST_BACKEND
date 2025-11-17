@@ -47,10 +47,11 @@ exports.getOrders = (req, res, next) => {
 // This is the middleware function which gets triggered when the "get" method for rendering the cart view requested on the server.
 exports.getCart = (req, res, next) => {
     Cart.fetchCart(cart => {
+        const intializationCart = (cart && Array.isArray(cart.products)) ? cart : { products: [], totalPrice: 0 };
         Product.fetchAll(product => {
             const cartProducts = [];
             for(const prod of product){
-                const cartProductData = cart.products.find(p => p.id === prod.id);
+                const cartProductData = intializationCart.products.find(p => p.id === prod.id);
                 if(cartProductData){
                     cartProducts.push({productData: prod, qty: cartProductData.qty});
                 }

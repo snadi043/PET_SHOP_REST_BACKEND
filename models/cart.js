@@ -11,8 +11,17 @@ module.exports = class Cart{
         fs.readFile(p, (err, fileContent) => {
             let cart = {products: [], totalPrice: 0};
             // If there is no error in reading the file then configuring to parse the data from the file which is expected to be in JSON format.
-            if(!err){
-                cart = { ...JSON.parse(fileContent)};
+            if(!err && fileContent){
+                try{
+                    const parsedContent = JSON.parse(fileContent);
+                    cart = {
+                        products: Array.isArray(parsedContent.products) ? parsedContent.products : [],
+                        totalPrice: typeof parsedContent.totalPrice === 'number' ? parsedContent.totalPrice : 0
+                    }
+                }
+                catch(parseError){
+                    console.error('Error parsing cart.json', parseError);
+                }
             }
             // If product is already in the cart -> then update the quantity by 1 and finally add the price to the total price.
             
@@ -54,6 +63,14 @@ module.exports = class Cart{
         fs.readFile(p, (err, fileContent) => {
             // If there is an error in reading the file just return.
             if(err){
+                return;
+            }
+            let parsedContent;
+            try{
+                parsedContent = JSON.parse(fileContent);
+            }
+            catch(parseError){
+                console.error('Error parsing cart.json for delete:', parseError);
                 return;
             }
             const updatedCart = {...JSON.parse(fileContent)};
