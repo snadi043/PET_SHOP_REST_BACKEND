@@ -8,6 +8,9 @@ const path = require('path');
 // Importing the body-parser package which is useful to read the data from the request body and use them in the application.
 const bodyParser = require('body-parser');
 
+// Importing the db utility module to create the connection with the database.
+const db = require('./utils/database');
+
 // Importing the error controller
 const errorController = require('./controllers/error');
 
@@ -31,9 +34,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(bodyParser.urlencoded({extended: false}));
 
 // This is the middleware function which gets triggered when the index page path is requested on the server.
-// app.use('/', (req, res, next) => {
-//     res.redirect('/');
-// });
+app.use('/', (req, res, next) => {
+    res.redirect('/');
+});
 
 // Congiruing all the routes to be registered with the express framework.
 app.use('/admin', adminProductRoutes);
