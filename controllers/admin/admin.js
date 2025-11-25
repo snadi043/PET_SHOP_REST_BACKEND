@@ -29,11 +29,16 @@ exports.postAddProducts = (req, res, next) => {
     const price = req.body.prod_price;
     const imageUrl = req.body.prod_imageUrl;
     const description = req.body.prod_description;
+    // After the associations are configured in the app.js file before the sync of the database, SEQUELIZE provides the concept of magic methods.
+    // Magic methods are basically the custom methods based on the action followed by the model once the assocaition between the models are created.
+    // In this case createProduct(); -> This magic method will take care of creating the metadata about the user when creating a new product usinf admin controllers.
+    // So by implementing the magic methods a way of logging users feature is created.
     Product.create({
         title: title,
         price: price,
         imageUrl: imageUrl,
         description: description,
+        userId: req.user,
     }).then(result => {
         console.log('admin.js - postAddProducts', result);
         res.redirect('/admin/products');

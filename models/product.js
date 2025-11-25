@@ -133,6 +133,7 @@ const Product = sequelize.define('products', {
     price: {
         type: DataTypes.DOUBLE,
         allowNull: false,
+        validate:{min: 0, max: 1000}
     },
     imageUrl: {
         type: DataTypes.STRING,
