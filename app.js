@@ -16,7 +16,8 @@ const errorController = require('./controllers/error');
 
 //Importing the models to build the association relationship between them in conjucion with the database interactions.
 const Product = require('./models/product');
-const Cart = require('./models/Cart');
+const Cart = require('./models/cart');
+const CartItem = require('./models/cart-item');
 const User = require('./models/user');
 
 // Importing all the routes in the application to register in the app.js file so that routing happens in an organized manner. 
@@ -63,11 +64,10 @@ User.hasMany(Product);
 Product.belongsTo(User, {constraints: true, onDelete: 'CASCADE'}); 
 
 // Lines 66 & 67 creates an association between User, Product and Cart Models.
-User.hasMany(Product);
-// User.hasOne(Cart);
-// Product.belongsToMany(Cart, {through: 'User'});
-// Cart.belongsTo(User);
-// User.hasMany(Product, {through: 'Cart'});
+User.hasOne(Cart);
+Cart.belongsTo(User);
+Product.belongsToMany(Cart, {through: CartItem});
+Cart.belongsToMany(Product, {through: CartItem});
 
 // Importing the database connection module here to connect it with the application.
 sequelize.sync().then((result) => {

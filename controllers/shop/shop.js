@@ -50,32 +50,42 @@ exports.getOrders = (req, res, next) => {
 
 // This is the middleware function which gets triggered when the "get" method for rendering the cart view requested on the server.
 exports.getCart = (req, res, next) => {
-    Cart.fetchCart(cart => {
-        const intializationCart = (cart && Array.isArray(cart.products)) ? cart : { products: [], totalPrice: 0 };
-        Product.findAll(product => {
-            const cartProducts = [];
-            for(const prod of product){
-                const cartProductData = intializationCart.products.find(p => p.id === prod.id);
-                if(cartProductData){
-                    cartProducts.push({productData: prod, qty: cartProductData.qty});
-                }
-            }
+    req.user.getCart().then(cart => {
+        return cart.getProducts().then(products => {
             res.render('shop/cart', {
-                docTitle: 'Cart Page',
-                path: '/cart',
-                products: cartProducts
-            });
-        });
-    });
+            docTitle: 'Cart Page',
+            path: '/cart',
+            products: products
+        }).catch(err => {console.log(err)}); // catch() -> for rendering the products.
+        }).catch(err => {console.log(err)}); // catch() -> for products;
+    }).catch(err => {console.log(err)}); // catch() -> for cart;
+    // Cart.fetchCart(cart => {
+    //     const intializationCart = (cart && Array.isArray(cart.products)) ? cart : { products: [], totalPrice: 0 };
+    //     Product.findAll(product => {
+    //         const cartProducts = [];
+    //         for(const prod of product){
+    //             const cartProductData = intializationCart.products.find(p => p.id === prod.id);
+    //             if(cartProductData){
+    //                 cartProducts.push({productData: prod, qty: cartProductData.qty});
+    //             }
+    //         }
+    //         res.render('shop/cart', {
+    //             docTitle: 'Cart Page',
+    //             path: '/cart',
+    //             products: cartProducts
+    //         });
+    //     });
+    // });
 }
 
 exports.postCart = (req, res, next) => {
     const prodId = req.body.productId;
+    
     // Instead of logging the productId here the idea is to store the product details to the cart.
-    Product.findByPk(prodId).then((product) => {
-        Cart.addToCart(prodId, product.price);
-    });
-    res.redirect('/cart');
+    // Product.findByPk(prodId).then((product) => {
+    //     Cart.addToCart(prodId, product.price);
+    // });
+    // res.redirect('/cart');
 }
 
 exports.postDeleteProductFromCart = (req, res, next) => {
