@@ -9,7 +9,7 @@ const path = require('path');
 const bodyParser = require('body-parser');
 
 // Importing the db utility module to create the connection with the database.
-const db = require('./utils/database');
+const sequelize = require('./utils/database');
 
 // Importing the error controller
 const errorController = require('./controllers/error');
@@ -43,5 +43,10 @@ app.use('/admin', adminProductRoutes);
 app.use(shopRoutes);
 app.use(errorController.getErrorPage);
 
+// Importing the database connection module here to connect it with the application.
+sequelize.sync().then(() => {
+    app.listen(3000);
+}).catch(err => {console.log(err)});
+
+// Using the Sequelize exports 
 // Configuring the application to listen to the port 3000 on the browser.
-app.listen(3000);

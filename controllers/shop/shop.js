@@ -4,25 +4,23 @@ const Cart = require('../../models/cart');
 
 // This is the middleware function which gets triggered when the "get" method for fetching all the products requested on the server.
 exports.getProducts = (req, res, next) => {
-    Product.fetchAll().then(products => {
-        // console.log('shop.js, getProducts:', products);
+    Product.findAll().then(products => {
         res.render('shop/product-list', {
-        prods: products[0],
+        prods: products,
         path: '/products',
         docTitle: 'All Products',
         });
-    }).catch(err => {console.log(err)});
+    });
 }
 
 // This is the middleware function which gets triggered when the "get" method for fetching a single product by id requested on the server.
 exports.getProductById = (req, res, next) => {
     const productId = req.params.prodId;
-    Product.fetchProductById(productId).then(([product]) => {
-        console.log('from getProductById:', product);
+    Product.findAll({where: {id: productId}}).then((product) => {
         res.render('shop/product-details', {
             docTitle: product.title,
             path: '/products',
-            product: product[0]
+            product: product
         });
     }).catch((err) => {
         console.log(err);
@@ -33,10 +31,9 @@ exports.getProductById = (req, res, next) => {
 exports.getIndexPage = (req, res, next) => {
     // Since the database methods are based on concepts of promises, here when using them it is expected to use the promise methods
     // like then() and catch() through which chaining can be made easy and readable.
-    Product.fetchAll().then((products) => {
-        // console.log('products:', products);
+    Product.findAll().then((products) => {
         res.render('shop/index', {
-        prods: products[0],
+        prods: products,
         path: '/',
         docTitle: 'Shop Page',
         });
@@ -55,7 +52,7 @@ exports.getOrders = (req, res, next) => {
 exports.getCart = (req, res, next) => {
     Cart.fetchCart(cart => {
         const intializationCart = (cart && Array.isArray(cart.products)) ? cart : { products: [], totalPrice: 0 };
-        Product.fetchAll(product => {
+        Product.findAll(product => {
             const cartProducts = [];
             for(const prod of product){
                 const cartProductData = intializationCart.products.find(p => p.id === prod.id);
@@ -75,15 +72,15 @@ exports.getCart = (req, res, next) => {
 exports.postCart = (req, res, next) => {
     const prodId = req.body.productId;
     // Instead of logging the productId here the idea is to store the product details to the cart.
-    Product.fetchProductById(prodId, (product) => {
+    Product.findByPk(prodId).then((product) => {
         Cart.addToCart(prodId, product.price);
-    })
+    });
     res.redirect('/cart');
 }
 
 exports.postDeleteProductFromCart = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.fetchProductById(prodId, products => {
+    Product.findByPk(prodId).then(products => {
         Cart.deleteProductFromCart(prodId, products.price);
         res.redirect('/cart');
     });

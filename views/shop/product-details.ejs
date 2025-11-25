@@ -3,13 +3,13 @@
 <%- include('../includes/navbar.ejs') %>
     <body>
         <main class="centered">
-            <h1><%= product.title %></h1>
+            <h1><%= product[0].title %></h1>
             <hr>
             <div>
-                <img src="<%= product.imageUrl %>" width="400px" height="400px" alt="<%= product.title %>"/>
+                <img src="<%= product[0].imageUrl %>" width="400px" height="400px" alt="<%= product.title %>"/>
             </div>
-                <h1>$<%= product.price %></h1>
-                <h2><%= product.description %></h2>
+                <h1>$<%= product[0].price %></h1>
+                <h2><%= product[0].description %></h2>
                 
             <%- include('../includes/add-to-cart.ejs') %>
         </main>
