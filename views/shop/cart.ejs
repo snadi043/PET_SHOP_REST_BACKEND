@@ -7,14 +7,14 @@
                 <ul>
                     <% products.forEach((prodData) => { %>
                         <li>
-                            <%= prodData.productData.title %> - (<%= prodData.productData.price %>)
-                            <form method="POST" action="/cart-delete-product">
-                                <input type="hidden" value="<%= prodData.productData.id %>" name="productId" />
-                                <button type="submit" class="btn">Delete</button>
-                            </form>
+                            <%= prodData.title %> - (<%= prodData.cartItems.quantity %>)
                         </li>
-                    <% }); %>
-                </ul>
+                        <% }); %>
+                    </ul>
+                    <form method="POST" action="/cart-delete-product">
+                        <input type="hidden" value="<%= prodData.id %>" name="productId" />
+                        <button type="submit" class="btn">Delete</button>
+                    </form>
                 <% } else { %>
                     <h1>No Products found in the Cart.</h1>
             <% } %>

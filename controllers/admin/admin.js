@@ -38,7 +38,7 @@ exports.postAddProducts = (req, res, next) => {
         price: price,
         imageUrl: imageUrl,
         description: description,
-        userId: req.user,
+        userId: req.user.id,
     }).then(result => {
         console.log('admin.js - postAddProducts', result);
         res.redirect('/admin/products');

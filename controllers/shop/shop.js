@@ -51,14 +51,17 @@ exports.getOrders = (req, res, next) => {
 // This is the middleware function which gets triggered when the "get" method for rendering the cart view requested on the server.
 exports.getCart = (req, res, next) => {
     req.user.getCart().then(cart => {
+        console.log('from getcart - in shop.js', cart);
         return cart.getProducts().then(products => {
+            console.log(products);
             res.render('shop/cart', {
             docTitle: 'Cart Page',
             path: '/cart',
-            products: products
+            products: products[0]
         }).catch(err => {console.log(err)}); // catch() -> for rendering the products.
         }).catch(err => {console.log(err)}); // catch() -> for products;
     }).catch(err => {console.log(err)}); // catch() -> for cart;
+    
     // Cart.fetchCart(cart => {
     //     const intializationCart = (cart && Array.isArray(cart.products)) ? cart : { products: [], totalPrice: 0 };
     //     Product.findAll(product => {
@@ -79,22 +82,48 @@ exports.getCart = (req, res, next) => {
 }
 
 exports.postCart = (req, res, next) => {
-    const prodId = req.body.productId;
-    
-    // Instead of logging the productId here the idea is to store the product details to the cart.
-    // Product.findByPk(prodId).then((product) => {
-    //     Cart.addToCart(prodId, product.price);
-    // });
-    // res.redirect('/cart');
+const prodId = req.body.productId;
+  let fetchedCart;
+  // Cart.getCartProducts().then(
+  req.user
+  .getCart().then(
+    cart => {
+      fetchedCart = cart;
+      return cart.getProducts({where: {id: prodId}});
+    }).then(products => {
+      // This is the code for already existing prodct in the cart.
+      let product;
+      if(products.length > 0){
+        product = products[0];
+      }
+      let newQuantity = 1;
+      // This is the code for new product in the cart
+        if(product){
+          const oldQuantity = product.cartItems.quantity;
+          newQuantity = oldQuantity + 1;
+          return fetchedCart.addProduct(product, {through: {quantity: newQuantity}});
+        }
+        return Product.findProductById(prodId).then(
+          product => {
+            return fetchedCart.addProduct(product, {through : newQuantity});
+          }
+        ).catch(err => {console.log(err)})
+        .then(() => {res.redirect('/cart')});
+      }).catch(err => {console.log(err)});
 }
 
 exports.postDeleteProductFromCart = (req, res, next) => {
     const prodId = req.body.productId;
-    Product.findByPk(prodId).then(products => {
-        Cart.deleteProductFromCart(prodId, products.price);
+    req.user.getCart().then(cart => {
+        return cart.getProducts({where: {id: prodId}}); 
+    }).then(products => {
+        const product = products[0];
+        return product.cartItem.destroy();
+    }).then(() => {
         res.redirect('/cart');
-    });
+    }).catch(err => {console.log(err)});
 }
+
 // This is the middleware function which gets triggered when the "get" method for rendering the checkout view requested on the server.
 exports.getCheckout = (req, res, next) => {
     res.render('shop/checkout', {
