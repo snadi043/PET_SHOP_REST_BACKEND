@@ -29,6 +29,9 @@ const errorController = require('./controllers/error');
 const adminProductRoutes = require('./routes/admin/admin-products');
 const shopRoutes = require('./routes/shop/shop');
 
+// Importing the models to use them to create neccessary actions in the application.
+const User = require('./models/user');
+
 // Configuring the application to use express.
 const app = express();
 
@@ -50,12 +53,12 @@ app.use(bodyParser.urlencoded({extended: false}));
 // });
 
 // Creating a middleware to manually log user into the application by injecting the user onto the request.
-// app.use((req, res, next) => {
-//     User.findByPk(1).then(user => {
-//         req.user = user; // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
-//         next();
-//     }).catch(err => {console.log(err)});
-// });
+app.use((req, res, next) => {
+    User.findUserById("69287ef76336cc40695cc698").then(user => {
+        req.user = user; // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
+        next();
+    }).catch(err => {console.log(err)});
+});
 
 // Congiruing all the routes to be registered with the express framework.
 app.use('/admin', adminProductRoutes);

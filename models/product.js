@@ -165,12 +165,13 @@ const mongodb = require('mongodb');
 const ObjectId = mongodb.ObjectId;
 
 class Product{
-    constructor(title, imageUrl, price, description, id){
+    constructor(title, imageUrl, price, description, id, userId){
         this.title = title;
         this.imageUrl = imageUrl;
         this.price = price;
         this.description = description;
         this._id = id ? new ObjectId(id) : null;
+        this.userId = userId;
     }
 
     static findAll(){
