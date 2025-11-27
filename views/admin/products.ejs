@@ -29,9 +29,9 @@
                         <div class="card__actions">
                             <!-- Adding a new link under with the button class to handle the details information of the product
                             by injecting the id of the product dynamically using ejs template. -->
-                            <a class="btn" href="/admin/edit-product/<%= product.id %>?edit=true">Edit</a>
+                            <a class="btn" href="/admin/edit-product/<%= product._id %>?edit=true">Edit</a>
                             <form method="POST" action="/admin/delete-product">
-                                <input type="hidden" value="<%= product.id %>" name="productId"/>
+                                <input type="hidden" value="<%= product._id %>" name="productId"/>
                                 <button type="submit" class="btn">Delete</a>
                             </form>
                             <!-- Importing the common code block for the "Add-to-cart" button view from the includes.
