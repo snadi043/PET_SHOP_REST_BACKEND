@@ -17,18 +17,18 @@ router.get('/products/:prodId', shopController.getProductById);
 // router.get('/product-details', shopController.getProductDetails);
 
 // GET -> /checkout
-router.get('/checkout', shopController.getCheckout);
+// router.get('/checkout', shopController.getCheckout);
 
 // GET -> /orders
-router.get('/orders', shopController.getOrders);
+// router.get('/orders', shopController.getOrders);
 
 // GET -> /cart
-router.get('/cart', shopController.getCart);
+// router.get('/cart', shopController.getCart);
 
 // POST -> /cart
-router.post('/cart', shopController.postCart);
+// router.post('/cart', shopController.postCart);
 
 // POST -> /cart-delete-product
-router.post('/cart-delete-product', shopController.postDeleteProductFromCart);
+// router.post('/cart-delete-product', shopController.postDeleteProductFromCart);
 
 module.exports = router;
