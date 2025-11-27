@@ -27,14 +27,42 @@
 // Now, let the database connection through "SEQULELIZE" happen here which can be exported as a module where ever needed in the application.
 
 // Importing the sequelize package in the application.
-const Sequelize = require('sequelize');
+// const Sequelize = require('sequelize');
 
-// Instanctiating the sequelize class to configured it in the application.
-const sequelize = new Sequelize('online-pet-shop', 'root', 'swathiKumar@18', {
-    host: 'localhost',
-    dialect: 'mysql',
-});
+// // Instanctiating the sequelize class to configured it in the application.
+// const sequelize = new Sequelize('online-pet-shop', 'root', 'swathiKumar@18', {
+//     host: 'localhost',
+//     dialect: 'mysql',
+// });
 
-module.exports = sequelize;
+// module.exports = sequelize;
 
 
+// Now, Implementing the database connections with "MONGODB", so the old code which is created with "SEQUELIZE" is commented out.
+
+const mongodb = require('mongodb');
+
+const MongoClient = mongodb.MongoClient;
+
+let _db;
+
+const mongoConnect = (callback) => {
+    MongoClient.connect('mongodb+srv://snadi043_db_user:ofa5A2r6E0OtnMSS@cluster0.ea85prw.mongodb.net/shop?appName=Cluster0')
+    .then((client) => {
+        _db = client.db();
+        callback();
+    }).catch(err => {
+        console.log(err);
+        throw err;
+    });
+}
+
+const getDb = () => {
+    if(_db){
+        return _db;
+    }
+    throw 'No database found!';
+};
+
+exports.mongoConnect = mongoConnect;
+exports.getDb = getDb;
