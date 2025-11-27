@@ -1,3 +1,6 @@
+// Importing the mongodb package to use the specific function in the model.
+const mongodb = require('mongodb');
+
 const Product = require('../../models/product');
 
 // This is the middleware function which gets triggered when the "get" method for adding the products path is requested on the server.
@@ -79,36 +82,27 @@ exports.getEditProduct = (req, res, next) => {
 }
 
 // This is the middleware function which gets triggered when the "post" method for editing the products path is requested on the server.
-// exports.postEditProduct = (req, res, next) => {
-//     const prodId = req.body.productId;
-//     const updatedTitle = req.body.prod_title;
-//     const updatedImageUrl = req.body.prod_imageUrl;
-//     const updatedPrice = req.body.prod_price;
-//     const updatedDescription = req.body.prod_description;
-//     // Here, when using SEQUELIZE, it is good pratice to first identify which item is supposed to be updated by using prodId.
-//     // Once, prodId is retrieved then, first save the updated information locally and then save it to the databse using "SEQUELIZE" save() method.
-//     Product.findByPk(prodId).then(product => {
-//         product.title = updatedTitle;
-//         product.imageUrl = updatedImageUrl;
-//         product.price = updatedPrice;
-//         product.description = updatedDescription;
-//         return product.save();
-//     }).then((result => {
-//         console.log(result);
-//         res.redirect('/admin/products');
-//     })).catch(err => {
-//         console.log(err);
-//     });
-// }
+exports.postEditProduct = (req, res, next) => {
+    const prodId = req.body.productId;
+    const updatedTitle = req.body.prod_title;
+    const updatedImageUrl = req.body.prod_imageUrl;
+    const updatedPrice = req.body.prod_price;
+    const updatedDescription = req.body.prod_description;
+
+    const updatedProduct = new Product(updatedTitle, updatedImageUrl, updatedPrice, updatedDescription, prodId);
+    updatedProduct.save().then((result => {
+        console.log('UpdateProductById', result);
+        res.redirect('/admin/products');
+    })).catch(err => {
+        console.log(err);
+    });
+}
 
 // This is the middleware function which gets triggered when the "post" method for deleting the products path is requested on the server.
-// exports.postDeleteProduct = (req, res, next) => {
-//     // Since delete is a POST method, the productId can be made accessible by using the input hidden type on the template body.
-//     const prodId = req.body.productId;
-//     Product.fetchProductById(prodId).then((product) => {
-//         console.log('deleteById', product);
-//         return product;
-//     }).then(() => {
-//         res.redirect('/admin/products');
-//     }).catch((err) => {console.log(err)});
-// }
+exports.postDeleteProduct = (req, res, next) => {
+    // Since delete is a POST method, the productId can be made accessible by using the input hidden type on the template body.
+    const prodId = req.body.productId;
+    Product.deleteProductById(prodId).then(() => {
+        res.redirect('/admin/products');
+    }).catch((err) => {console.log(err)});
+}

@@ -162,12 +162,15 @@ const mongodb = require('mongodb');
 // To avoid this, mongodb package provides with ObjectID() method through which "_id" can be refactored into "ObjectId" data type.
 // const ObjectId = new mongodb.ObjectId();
 
+const ObjectId = mongodb.ObjectId;
+
 class Product{
-    constructor(title, imageUrl, price, description){
+    constructor(title, imageUrl, price, description, id){
         this.title = title;
         this.imageUrl = imageUrl;
         this.price = price;
         this.description = description;
+        this._id = id ? new ObjectId(id) : null;
     }
 
     static findAll(){
@@ -179,9 +182,18 @@ class Product{
 
     save(){
         const db = getDb();
-        return db.collection('products').insertOne(this)
+        let updatedProductObject;
+        if(this._id){
+            // Update
+            updatedProductObject = db.collection('products').updateOne({_id: this._id}, {$set:this});
+        }
+        else{
+            // Create new 
+            updatedProductObject = db.collection('products').insertOne(this);
+        }
+        return updatedProductObject
         .then(result => {console.log(result)})
-        .catch(err => {console.log(err)});
+            .catch(err => {console.log(err)});
     }
 
     static fetchProductById(prodId){
@@ -197,12 +209,11 @@ class Product{
     static deleteProductById(id){
         const db = getDb();
         return db.collection('products').deleteOne({_id: new mongodb.ObjectId(id)})
-        .next()
         .then(product => {
             console.log(product);
-            return product;
         }).catch(err => console.log(err));
     }
+
 }
 
 module.exports = Product;
