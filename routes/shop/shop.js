@@ -23,10 +23,10 @@ router.get('/products/:prodId', shopController.getProductById);
 // router.get('/orders', shopController.getOrders);
 
 // GET -> /cart
-// router.get('/cart', shopController.getCart);
+router.get('/cart', shopController.getCart);
 
 // POST -> /cart
-// router.post('/cart', shopController.postCart);
+router.post('/cart', shopController.postCart);
 
 // POST -> /cart-delete-product
 // router.post('/cart-delete-product', shopController.postDeleteProductFromCart);

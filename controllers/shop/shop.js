@@ -2,6 +2,8 @@ const Product = require('../../models/product');
 
 const Cart = require('../../models/cart');
 
+const User = require('../../models/user');
+
 // This is the middleware function which gets triggered when the "get" method for fetching all the products requested on the server.
 exports.getProducts = (req, res, next) => {
     Product.findAll().then(products => {
@@ -52,6 +54,9 @@ exports.getOrders = (req, res, next) => {
 
 // This is the middleware function which gets triggered when the "get" method for rendering the cart view requested on the server.
 exports.getCart = (req, res, next) => {
+    // req.user.cart.then(products => {
+    //     return Product.fetchProductById(products._id);
+    // });
     // req.user.getCart().then(cart => {
     //     console.log('from getcart - in shop.js', cart);
     //     return cart.getProducts().then(products => {
@@ -84,34 +89,11 @@ exports.getCart = (req, res, next) => {
 }
 
 exports.postCart = (req, res, next) => {
-// const prodId = req.body.productId;
-//   let fetchedCart;
-//   // Cart.getCartProducts().then(
-//   req.user
-//   .getCart().then(
-//     cart => {
-//       fetchedCart = cart;
-//       return cart.getProducts({where: {id: prodId}});
-//     }).then(products => {
-//       // This is the code for already existing prodct in the cart.
-//       let product;
-//       if(products.length > 0){
-//         product = products[0];
-//       }
-//       let newQuantity = 1;
-//       // This is the code for new product in the cart
-//         if(product){
-//           const oldQuantity = product.cartItems.quantity;
-//           newQuantity = oldQuantity + 1;
-//           return fetchedCart.addProduct(product, {through: {quantity: newQuantity}});
-//         }
-//         return Product.findProductById(prodId).then(
-//           product => {
-//             return fetchedCart.addProduct(product, {through : newQuantity});
-//           }
-//         ).catch(err => {console.log(err)})
-//         .then(() => {res.redirect('/cart')});
-//       }).catch(err => {console.log(err)});
+    const prodId = req.body.productId;
+    Product.fetchProductById(prodId).then(product => {
+        return req.user.addToCart(product)
+        .then(result => res.redirect('/cart'));
+    }).catch(err => {console.log(err)});
 }
 
 exports.postDeleteProductFromCart = (req, res, next) => {

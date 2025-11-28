@@ -55,7 +55,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 // Creating a middleware to manually log user into the application by injecting the user onto the request.
 app.use((req, res, next) => {
     User.findUserById("69287ef76336cc40695cc698").then(user => {
-        req.user = user; // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
+        req.user = new User(user.name, user.email, user.cart, user._id); // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
         next();
     }).catch(err => {console.log(err)});
 });
