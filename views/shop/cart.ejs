@@ -1,23 +1,32 @@
 <%- include('../includes/header.ejs') %>
+    <link rel="stylesheet" href="/css/cart.css">
+    </head>
 
-<%- include('../includes/navbar.ejs') %>
     <body>
+        <%- include('../includes/navbar.ejs') %>
         <main>
-            <% if(products.length > 0) { %>
-                <ul>
-                    <% products.forEach((prodData) => { %>
-                        <li>
-                            <%= prodData.title %> - (<%= prodData.quantity %>)
+            <% if (products.length > 0) { %>
+                <ul class="cart__item-list">
+                    <% products.forEach(p => { %>
+                        <li class="cart__item">
+                            <h1><%=p.title%></h1>
+                            <h2>Quantity: <%=p.quantity%></h2>
+                            <form action="/cart-delete-item" method="POST">
+                                <input type="hidden" value="<%=p._id%>" name="productId">
+                                <button class="btn danger" type="submit">Delete</button>
+                            </form>
                         </li>
-                        <% }); %>
-                    </ul>
-                    <form method="POST" action="/cart-delete-product">
-                        <input type="hidden" value="<%= prodData._id %>" name="productId" />
-                        <button type="submit" class="btn">Delete</button>
+                    <% }) %>
+                </ul>
+                <hr>
+                <div class="centered">
+                    <form action="/create-order" method="POST">
+                        <button type="submit" class="btn">Order Now!</button>
                     </form>
-                <% } else { %>
-                    <h1>No Products found in the Cart.</h1>
+                </div>
+                
+            <% } else { %>
+                <h1>No Products in Cart!</h1>
             <% } %>
         </main>
-        
-<%- include('../includes/footer.ejs') %>
+        <%- include('../includes/footer.ejs') %>

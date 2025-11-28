@@ -38,7 +38,6 @@ exports.postAddProducts = (req, res, next) => {
     product.save()
     .then(result => {
         res.redirect('/admin/products');
-        console.log('postAddProduct', result);
     })
     .catch(err => {console.log(err)});
 };
@@ -55,7 +54,6 @@ exports.getEditProduct = (req, res, next) => {
     }
     // Condition to handle if the "entered id" is not an valid id attached to the product then return to the index page.
     Product.fetchProductById(productId).then(product => {
-        console.log('getEditProduct', product);
         if(!product){
             return res.redirect('/');
         }
@@ -78,7 +76,6 @@ exports.postEditProduct = (req, res, next) => {
 
     const updatedProduct = new Product(updatedTitle, updatedImageUrl, updatedPrice, updatedDescription, prodId);
     updatedProduct.save().then((result => {
-        console.log('UpdateProductById', result);
         res.redirect('/admin/products');
     })).catch(err => {
         console.log(err);

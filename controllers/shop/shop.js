@@ -19,7 +19,6 @@ exports.getProducts = (req, res, next) => {
 exports.getProductById = (req, res, next) => {
     const productId = req.params.prodId;
     Product.fetchProductById(productId).then((product) => {
-        console.log('fetchProductById', product);
         res.render('shop/product-details', {
             docTitle: product.title,
             path: '/products',
@@ -35,7 +34,6 @@ exports.getIndexPage = (req, res, next) => {
     // Since the database methods are based on concepts of promises, here when using them it is expected to use the promise methods
     // like then() and catch() through which chaining can be made easy and readable.
     Product.findAll().then(products => {
-        console.log('findAll', products);
         res.render('shop/index', {
         prods: products,
         path: '/',
@@ -54,45 +52,23 @@ exports.getOrders = (req, res, next) => {
 
 // This is the middleware function which gets triggered when the "get" method for rendering the cart view requested on the server.
 exports.getCart = (req, res, next) => {
-    // req.user.cart.then(products => {
-    //     return Product.fetchProductById(products._id);
-    // });
-    // req.user.getCart().then(cart => {
-    //     console.log('from getcart - in shop.js', cart);
-    //     return cart.getProducts().then(products => {
-    //         console.log(products);
-    //         res.render('shop/cart', {
-    //         docTitle: 'Cart Page',
-    //         path: '/cart',
-    //         products: products[0]
-    //     }).catch(err => {console.log(err)}); // catch() -> for rendering the products.
-    //     }).catch(err => {console.log(err)}); // catch() -> for products;
-    // }).catch(err => {console.log(err)}); // catch() -> for cart;
-    
-    // Cart.fetchCart(cart => {
-    //     const intializationCart = (cart && Array.isArray(cart.products)) ? cart : { products: [], totalPrice: 0 };
-    //     Product.findAll(product => {
-    //         const cartProducts = [];
-    //         for(const prod of product){
-    //             const cartProductData = intializationCart.products.find(p => p.id === prod.id);
-    //             if(cartProductData){
-    //                 cartProducts.push({productData: prod, qty: cartProductData.qty});
-    //             }
-    //         }
-    //         res.render('shop/cart', {
-    //             docTitle: 'Cart Page',
-    //             path: '/cart',
-    //             products: cartProducts
-    //         });
-    //     });
-    // });
+    req.user.getCart().then(products => {
+        res.render('shop/cart', {
+        docTitle: 'Cart Page',
+        path: '/cart',
+        products: products
+    });
+    }).catch(err => {console.log(err)});
 }
 
 exports.postCart = (req, res, next) => {
     const prodId = req.body.productId;
     Product.fetchProductById(prodId).then(product => {
         return req.user.addToCart(product)
-        .then(result => res.redirect('/cart'));
+        .then(result => 
+            {
+                res.redirect('/cart');
+            });
     }).catch(err => {console.log(err)});
 }
 

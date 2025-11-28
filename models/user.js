@@ -46,13 +46,46 @@ class User{
     }
 
     addToCart(product){
-        const updatedCart = {items: [{productId: new ObjectId(product._id), quantity: 1}]};
+        // Accessing the updatedCartItems to then check if the products in the cart are existing or new proudcts.
+        const updatedCartItems = [ ...this.cart.items ];
+
+        // This is the check where a product which the user wants to add to the cart already exists in the cart.
+        // In this case, the quantity has to be altered by adding 1 to the existing quantity;
+        const updatedCartItemIndex = this.cart.items.findIndex(cp => {
+            return cp.productId.toString() == product._id.toString();
+        });
+
+        let newQuantity = 1;
+
+        // Checking the condition if Index returns 1 then item exists in the cart.
+        if(updatedCartItemIndex >= 0){
+            newQuantity = this.cart.items[updatedCartItemIndex].quantity + 1;
+            updatedCartItems[updatedCartItemIndex].quantity = newQuantity;
+        }
+        else{
+            updatedCartItems.push({productId: new ObjectId(product._id), newQuantity});
+        }
+        const updatedCart = {items: updatedCartItems};
         const db = getDb();
-        return db.collection('users').updateOne({_id: this._id}, {$set:{cart: updatedCart}})
-        .then((cart) => {
-            console.log('addToCart', cart);
-            return cart;
-        }).catch(err => {console.log(err)});
+        return db.collection('users').updateOne({_id: this._id}, {$set:{cart: updatedCart}});
+    }
+
+    getCart(){
+        // This method has to finally return the product which holds the product title and product qunatity to render on the cart page.
+        const db = getDb();
+        const productIds = this.cart.items.map(i => {
+            return i.productId;
+        });
+        return db.collection('products').find({_id: {$in: productIds}}).toArray().then(product => {
+            return product.map(p => {
+                return {
+                    ...p,
+                    quantity: this.cart.items.find(i => {
+                        return i.productId.toString() === p._id.toString();
+                    }).quantity
+                }
+            });
+        });
     }
 
     static findUserById(userId){
