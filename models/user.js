@@ -2,11 +2,11 @@ const mongoDB = require('mongodb');
 
 const ObjectId = mongoDB.ObjectId;
 
-const getDb = require('../util/database').getDb;
+const getDb = require('../utils/database').getDb;
 
 class Users{
-  constructor(name, email, cart, id){
-    this.name = name;
+  constructor(username, email, cart, id){
+    this.name = username;
     this.email = email;
     this.cart = cart; // {items: [{}]}
     this._id = id;
@@ -58,7 +58,7 @@ class Users{
         return {
           ...p, quantity: this.cart.items.find(i => {
             return i.productId.toString() === p._id.toString();
-          })
+          }).quantity
         }
       });
     });
@@ -74,30 +74,28 @@ class Users{
 
   addOrders(){
     const db = getDb();
-    // Getting the access to the products to disply in the orders.
+
+    // Order has to contain the details about the product and the user.
+    // So, in this user model, we can access the cart to get the product information using the relations concept.
     return this.getCart().then(products => {
-      // Getting the access to the users information in the orders while adding an order to the collection.
-      const orders = {
-        items: products,
-        users: {
-          _id: new ObjectId(this._id),
-          name: this.name
-        }
-      };
-      return db.collection('orders').insertOne(orders);
-    })
-    .then(result => {
+        const order = {
+            items: products,
+            user: {
+                _id: new ObjectId(this._id),
+                name: this.name
+            }
+        };
+        return db.collection('orders').insertOne(order);
+    }).then(result => {
         this.cart = {items: []};
-        return db.collection('users').updateOne({_id: new ObjectId(this._id)}, {$set: {cart:{items: []}}});
-      })
+        return db.collection('users').updateOne({_id: new ObjectId(this._id)}, {$set: {cart: {items: [] } }});
+    }).catch(err => {console.log(err)});
   }
 
   getOrders(){
     const db = getDb();
-    return db.collection('orders')
-    .find({'users._id' : new ObjectId(this._id)}) // finding the properties within the collections in the find() method provided by mongoDb using the ''.
-    .toArray();
+    return db.collection('orders').find({'user._id': new Object(this._id)}).toArray();
   }
-}
 
+}
 module.exports = Users;

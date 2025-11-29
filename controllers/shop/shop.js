@@ -42,22 +42,15 @@ exports.getIndexPage = (req, res, next) => {
     }).catch(err => {console.log(err)});
 }
 
-// This is the middleware function which gets triggered when the "get" method for fetching the Orders requested on the server.
-exports.getOrders = (req, res, next) => {
-    // res.render('shop/orders', {
-    //     docTitle: 'Orders Page',
-    //     path: '/orders'
-    // });
-}
 
 // This is the middleware function which gets triggered when the "get" method for rendering the cart view requested on the server.
 exports.getCart = (req, res, next) => {
     req.user.getCart().then(products => {
         res.render('shop/cart', {
-        docTitle: 'Cart Page',
-        path: '/cart',
-        products: products
-    });
+            docTitle: 'Cart Page',
+            path: '/cart',
+            products: products
+        });
     }).catch(err => {console.log(err)});
 }
 
@@ -69,12 +62,31 @@ exports.postCart = (req, res, next) => {
             {
                 res.redirect('/cart');
             });
-    }).catch(err => {console.log(err)});
-}
+        }).catch(err => {console.log(err)});
+    }
+    
+    exports.postDeleteProductFromCart = (req, res, next) => {
+        const prodId = req.body.productId;
+        req.user.deleteItemsFromCart(prodId).then((product) => {
+            res.redirect('/cart');
+        }).catch(err => {console.log(err)});
+    }
+    
+    // This is the middleware function which gets triggered when the "get" method for fetching the Orders requested on the server.
+    exports.getOrders = (req, res, next) => {
+        req.user.getOrders().then(orders => {
+            res.render('shop/orders', {
+                docTitle: 'Orders Page',
+                path: '/orders',
+                orders: orders
+            });
+        }).catch(err => {console.log(err)});
+    }
 
-exports.postDeleteProductFromCart = (req, res, next) => {
-    const prodId = req.body.productId;
-    req.user.deleteItemsFromCart(prodId).then((product) => {
-        res.redirect('/cart');
-    }).catch(err => {console.log(err)});
-}
+    // This is the middleware function which gets triggered when the "POST" method for fetching the Orders requested on the server.
+    exports.postAddOrders = (req, res, next) => {
+        req.user.addOrders().then(order => {
+            console.log('postAddOrders', order);
+            res.redirect('/orders');
+        }).catch(err => {console.log(err)});
+    }
