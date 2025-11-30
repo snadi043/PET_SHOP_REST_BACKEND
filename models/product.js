@@ -149,71 +149,71 @@
 
 // Refactoring the Product Model to configure with the Mongodb Model structure.
 
-// Importing the db connection from the utility database.
-const getDb = require('../utils/database').getDb;
+// // Importing the db connection from the utility database.
+// const getDb = require('../utils/database').getDb;
 
-// Importing the mongodb package to use the specific function in the model.
-const mongodb = require('mongodb');
+// // Importing the mongodb package to use the specific function in the model.
+// const mongodb = require('mongodb');
 
-// The important aspect of mongodb is that it stores the "id" in the mongodb database in the format of "_id".
-// So, when any filtering is being used in the application it is important to note that "_id" is the value that has to be used.
-// Also, one other important aspect of mongodb is that the data type format of "_id" in mongodb is not just any "INTERGER" or "STRING".
-// Rather, it is of the type "ObjectID" -> So, when regular "_id" is used by itself in the application unsual functionality takes place.
-// To avoid this, mongodb package provides with ObjectID() method through which "_id" can be refactored into "ObjectId" data type.
-// const ObjectId = new mongodb.ObjectId();
+// // The important aspect of mongodb is that it stores the "id" in the mongodb database in the format of "_id".
+// // So, when any filtering is being used in the application it is important to note that "_id" is the value that has to be used.
+// // Also, one other important aspect of mongodb is that the data type format of "_id" in mongodb is not just any "INTERGER" or "STRING".
+// // Rather, it is of the type "ObjectID" -> So, when regular "_id" is used by itself in the application unsual functionality takes place.
+// // To avoid this, mongodb package provides with ObjectID() method through which "_id" can be refactored into "ObjectId" data type.
+// // const ObjectId = new mongodb.ObjectId();
 
-const ObjectId = mongodb.ObjectId;
+// const ObjectId = mongodb.ObjectId;
 
-class Product{
-    constructor(title, imageUrl, price, description, id, userId){
-        this.title = title;
-        this.imageUrl = imageUrl;
-        this.price = price;
-        this.description = description;
-        this._id = id ? new ObjectId(id) : null;
-        this.userId = userId;
-    }
+// class Product{
+//     constructor(title, imageUrl, price, description, id, userId){
+//         this.title = title;
+//         this.imageUrl = imageUrl;
+//         this.price = price;
+//         this.description = description;
+//         this._id = id ? new ObjectId(id) : null;
+//         this.userId = userId;
+//     }
 
-    static findAll(){
-        const db = getDb();
-        return db.collection('products').find().toArray()
-        .then(product => {return product})
-        .catch(err => {console.log(err)});
-    }
+//     static findAll(){
+//         const db = getDb();
+//         return db.collection('products').find().toArray()
+//         .then(product => {return product})
+//         .catch(err => {console.log(err)});
+//     }
 
-    save(){
-        const db = getDb();
-        let updatedProductObject;
-        if(this._id){
-            // Update
-            updatedProductObject = db.collection('products').updateOne({_id: this._id}, {$set:this});
-        }
-        else{
-            // Create new 
-            updatedProductObject = db.collection('products').insertOne(this);
-        }
-        return updatedProductObject
-        .then(result => {console.log(result)})
-            .catch(err => {console.log(err)});
-    }
+//     save(){
+//         const db = getDb();
+//         let updatedProductObject;
+//         if(this._id){
+//             // Update
+//             updatedProductObject = db.collection('products').updateOne({_id: this._id}, {$set:this});
+//         }
+//         else{
+//             // Create new 
+//             updatedProductObject = db.collection('products').insertOne(this);
+//         }
+//         return updatedProductObject
+//         .then(result => {console.log(result)})
+//             .catch(err => {console.log(err)});
+//     }
 
-    static fetchProductById(prodId){
-        const db = getDb();
-        return db.collection('products').find({_id: new mongodb.ObjectId(prodId)})
-        .next()
-        .then(product => {
-            return product
-        }).catch(err => {console.log(err)});
-    }
+//     static fetchProductById(prodId){
+//         const db = getDb();
+//         return db.collection('products').find({_id: new mongodb.ObjectId(prodId)})
+//         .next()
+//         .then(product => {
+//             return product
+//         }).catch(err => {console.log(err)});
+//     }
 
-    static deleteProductById(id){
-        const db = getDb();
-        return db.collection('products').deleteOne({_id: new mongodb.ObjectId(id)})
-        .then(product => {
-            console.log(product);
-        }).catch(err => console.log(err));
-    }
+//     static deleteProductById(id){
+//         const db = getDb();
+//         return db.collection('products').deleteOne({_id: new mongodb.ObjectId(id)})
+//         .then(product => {
+//             console.log(product);
+//         }).catch(err => console.log(err));
+//     }
 
-}
+// }
 
-module.exports = Product;
+// module.exports = Product;
