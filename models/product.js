@@ -248,4 +248,4 @@ const productSchema = new Schema({
 
 // Exporting the schema module which intially creates the communication with the database and does all the heavy lifting
 // in terms of creating queries in the backend and providing access to the inbuilt mongoose methods to work in the controllers.
-module.exports = Schema.model('product', productSchema);
+module.exports = mongoose.model('product', productSchema);

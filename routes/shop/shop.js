@@ -5,13 +5,13 @@ const router = express.Router();
 const shopController = require('../../controllers/shop/shop');
 
 // // GET -> /
-// router.get('/', shopController.getIndexPage);
+router.get('/', shopController.getIndexPage);
 
 // // GET -> /product-list
-// router.get('/products', shopController.getProducts);
+router.get('/products', shopController.getProducts);
 
 // // GET -> /product/id
-// router.get('/products/:prodId', shopController.getProductById);
+router.get('/products/:prodId', shopController.getProductById);
 
 // // GET -> /orders
 // router.get('/orders', shopController.getOrders);
