@@ -217,3 +217,35 @@
 // }
 
 // module.exports = Product;
+
+
+// Here, refactoring the PRODUCT model to provision the concept of MONGOOSE which is ODM into the application.
+
+// Importing Mongoose library.
+const mongoose = require('mongoose');
+
+// Importing the Schema module in the mongoose package to create customized Schema fot the PRODUCT.
+const Schema = mongoose.Schema;
+
+const productSchema = new Schema({
+    title: {
+        type: String,
+        required: true
+    },
+    imageUrl: {
+        type: String,
+        required: true,
+    },
+    price: {
+        type: String,
+        required: true,
+    },
+    description: {
+        type: String,
+        required: true
+    }
+});
+
+// Exporting the schema module which intially creates the communication with the database and does all the heavy lifting
+// in terms of creating queries in the backend and providing access to the inbuilt mongoose methods to work in the controllers.
+module.exports = Schema.model('product', productSchema);

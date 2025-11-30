@@ -12,10 +12,13 @@ const bodyParser = require('body-parser');
 // const sequelize = require('./utils/database');
 
 // Importing the MongoClient from the utility directory to create the connection to the "MONGODB" backend database.
-const mongoConnect = require('./utils/database').mongoConnect;
+// const mongoConnect = require('./utils/database').mongoConnect;
 
 // Importing the error controller
 const errorController = require('./controllers/error');
+
+// Importing the mongoose package to create the database connection.
+const mongoose = require('mongoose');
 
 //Importing the models to build the association relationship between them in conjucion with the database interactions.
 // const Product = require('./models/product');
@@ -53,12 +56,12 @@ app.use(bodyParser.urlencoded({extended: false}));
 // });
 
 // Creating a middleware to manually log user into the application by injecting the user onto the request.
-app.use((req, res, next) => {
-    User.getUserById("6929c3c96336cc40695cc6a2").then(user => {
-        req.user = new User(user.username, user.email, user.cart, user._id); // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
-        next();
-    }).catch(err => {console.log(err)});
-});
+// app.use((req, res, next) => {
+//     User.getUserById("6929c3c96336cc40695cc6a2").then(user => {
+//         req.user = new User(user.username, user.email, user.cart, user._id); // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
+//         next();
+//     }).catch(err => {console.log(err)});
+// });
 
 // Congiruing all the routes to be registered with the express framework.
 app.use('/admin', adminProductRoutes);
@@ -101,6 +104,8 @@ app.use(errorController.getErrorPage);
 // Configuring the application to listen to the port 3000 on the browser.
 
 
-mongoConnect(() => {
+mongoose.connect('mongodb+srv://snadi043_db_user:ofa5A2r6E0OtnMSS@cluster0.ea85prw.mongodb.net/shop?appName=Cluster0')
+.then(() => {
+    console.log('DATABASE CONNECTED!!!');
     app.listen(3000);
-});
+}).catch(err => {console.log(err)});
