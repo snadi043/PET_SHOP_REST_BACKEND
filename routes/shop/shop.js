@@ -19,13 +19,13 @@ router.get('/products/:prodId', shopController.getProductById);
 // // POST -> /orders
 // router.post('/create-order', shopController.postAddOrders);
 
-// // GET -> /cart
-// router.get('/cart', shopController.getCart);
+// GET -> /cart
+router.get('/cart', shopController.getCart);
 
-// // POST -> /cart
-// router.post('/cart', shopController.postCart);
+// POST -> /cart
+router.post('/cart', shopController.postCart);
 
-// // POST -> /cart-delete-product
-// router.post('/cart-delete-product', shopController.postDeleteProductFromCart);
+// POST -> /cart-delete-product
+router.post('/cart-delete-product', shopController.postDeleteProductFromCart);
 
 module.exports = router;

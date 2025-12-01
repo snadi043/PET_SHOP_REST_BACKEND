@@ -129,4 +129,43 @@ const userSchema = new Schema({
   }
 });
 
-module.exports = mongoose.model('user', userSchema);
+
+// Mongoose gives the flexibility to add the utility / custom methods to the model.
+userSchema.methods.addToCart = function(product){
+  // addToCart() is the method which depends upon the userId and makes a relation between user and the cart.
+  // Based on the userId, the cart gets the access to add the products.
+
+    // Cheking if the product is existing in the cart already in the collection by comparing the indexes
+    const cartProdutIndex = this.cart.items.findIndex(cp => {
+      return cp.productId.toString() === product._id.toString();
+    });
+
+    let newQuantity = 1;
+    const updatedCartItems = [...this.cart.items] // getting access to all the items in the cart so that they can be edited as per the conditions.
+    // If the product is already existing then increase the quantity by 1.
+    if(cartProdutIndex >= 0){
+      newQuantity = this.cart.items[cartProdutIndex].quantity + 1; 
+      updatedCartItems[cartProdutIndex].quantity = newQuantity;
+    }
+    // If it is new product then create a new object of the item with the product data and the quantity with the push() method.
+    else{
+      updatedCartItems.push({productId: product._id, quantity: newQuantity});
+    }
+    // updatedCart is basically the format/schema of the cart that is to be stored in the users collection.
+    // Finally always passing the information of the updatedCartItems to the updatedCart.
+    const updatedCart = {items: updatedCartItems};
+
+    this.cart = updatedCart;
+
+    return this.save();
+  }
+
+  userSchema.methods.deleteItemsFromCart = function (productId){
+    const updatedCartItems = this.cart.items.filter(products => {
+      return products.productId.toString() !== productId.toString();
+    })
+   this.cart.items = updatedCartItems;
+   return this.save();
+  }
+
+module.exports = mongoose.model('User', userSchema);

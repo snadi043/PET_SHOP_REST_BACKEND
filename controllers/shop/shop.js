@@ -49,34 +49,37 @@ exports.getIndexPage = (req, res, next) => {
 }
 
 
-// // This is the middleware function which gets triggered when the "get" method for rendering the cart view requested on the server.
-// exports.getCart = (req, res, next) => {
-//     req.user.getCart().then(products => {
-//         res.render('shop/cart', {
-//             docTitle: 'Cart Page',
-//             path: '/cart',
-//             products: products
-//         });
-//     }).catch(err => {console.log(err)});
-// }
+// This is the middleware function which gets triggered when the "get" method for rendering the cart view requested on the server.
+exports.getCart = (req, res, next) => {
+    req.user.populate('cart.items.productId')
+    .then((user) => {
+        const products = user.cart.items;
+        res.render('shop/cart',
+        {
+            docTitle: 'Cart Page',
+            path: '/cart',
+            products: products
+        });
+    }).catch(err => {console.log(err)});
+}
 
-// exports.postCart = (req, res, next) => {
-//     const prodId = req.body.productId;
-//     Product.fetchProductById(prodId).then(product => {
-//         return req.user.addToCart(product)
-//         .then(result => 
-//             {
-//                 res.redirect('/cart');
-//             });
-//         }).catch(err => {console.log(err)});
-//     }
+exports.postCart = (req, res, next) => {
+    const prodId = req.body.productId;
+    Product.findById(prodId).then(product => {
+        return req.user.addToCart(product);
+    }).then(cart => 
+        {
+            console.log('AddToCart', cart);
+            res.redirect('/cart');
+        }).catch(err => {console.log(err)});
+    }
     
-//     exports.postDeleteProductFromCart = (req, res, next) => {
-//         const prodId = req.body.productId;
-//         req.user.deleteItemsFromCart(prodId).then((product) => {
-//             res.redirect('/cart');
-//         }).catch(err => {console.log(err)});
-//     }
+    exports.postDeleteProductFromCart = (req, res, next) => {
+        const prodId = req.body.productId;
+        req.user.deleteItemsFromCart(prodId).then(() => {
+            res.redirect('/cart');
+        }).catch(err => {console.log(err)});
+    }
     
 //     // This is the middleware function which gets triggered when the "get" method for fetching the Orders requested on the server.
 //     exports.getOrders = (req, res, next) => {
