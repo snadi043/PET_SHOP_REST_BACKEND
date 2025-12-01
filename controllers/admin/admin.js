@@ -37,7 +37,14 @@ exports.postAddProducts = (req, res, next) => {
     const description = req.body.prod_description;
     
     // Using the instance of the Product model to save an Object of the data to the "shop" collection as a single document.
-    const product = new Product({title: title, imageUrl: imageUrl, price: price, description: description});
+    const product = new Product(
+        {
+            title: title, 
+            imageUrl: imageUrl, 
+            price: price, 
+            description: description,
+            userId: req.user, // mongoose behind the screen grabs the userId from the req since a reference is created between User and Product Models.
+        });
     product.save()
     .then(product => {
         console.log('AddAdminProducts', product);

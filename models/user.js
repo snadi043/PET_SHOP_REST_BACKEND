@@ -105,8 +105,6 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const Product = require('../models/product');
-
 const userSchema = new Schema({
   username: {
     type: String,
@@ -120,7 +118,7 @@ const userSchema = new Schema({
     items: [{
       productId: {
         type: mongoose.Types.ObjectId,
-        ref: Product,
+        ref: 'Product',
         required: true
       },
       quantity: {
@@ -130,6 +128,5 @@ const userSchema = new Schema({
     }]
   }
 });
-
 
 module.exports = mongoose.model('user', userSchema);

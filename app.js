@@ -58,7 +58,6 @@ app.use(bodyParser.urlencoded({extended: false}));
 // Creating a middleware to manually log user into the application by injecting the user onto the request.
 app.use((req, res, next) => {
     User.findById('692dad848b63e8870f83e1c6').then(user => {
-        console.log('findByIdUser', user);
         req.user = user; // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
         next();
     }).catch(err => {console.log(err)});

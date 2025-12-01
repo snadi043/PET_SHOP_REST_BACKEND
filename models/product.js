@@ -227,8 +227,8 @@ const mongoose = require('mongoose');
 // Importing the Schema module in the mongoose package to create customized Schema fot the PRODUCT.
 const Schema = mongoose.Schema;
 
+// Importing the User model to create a reference in MODEL format in the Product Model.
 const User = require('../models/user');
-
 
 const productSchema = new Schema({
     title: {
@@ -249,7 +249,8 @@ const productSchema = new Schema({
     },
     userId:{
         type: mongoose.Types.ObjectId,
-        ref: User
+        ref: User,
+        required: true
     }
 });
 
