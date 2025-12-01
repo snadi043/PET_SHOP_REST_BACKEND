@@ -56,12 +56,13 @@ app.use(bodyParser.urlencoded({extended: false}));
 // });
 
 // Creating a middleware to manually log user into the application by injecting the user onto the request.
-// app.use((req, res, next) => {
-//     User.getUserById("6929c3c96336cc40695cc6a2").then(user => {
-//         req.user = new User(user.username, user.email, user.cart, user._id); // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
-//         next();
-//     }).catch(err => {console.log(err)});
-// });
+app.use((req, res, next) => {
+    User.findById('692dad848b63e8870f83e1c6').then(user => {
+        console.log('findByIdUser', user);
+        req.user = user; // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
+        next();
+    }).catch(err => {console.log(err)});
+});
 
 // Congiruing all the routes to be registered with the express framework.
 app.use('/admin', adminProductRoutes);
@@ -105,7 +106,20 @@ app.use(errorController.getErrorPage);
 
 
 mongoose.connect('mongodb+srv://snadi043_db_user:ofa5A2r6E0OtnMSS@cluster0.ea85prw.mongodb.net/shop?appName=Cluster0')
-.then(() => {
-    console.log('DATABASE CONNECTED!!!');
-    app.listen(3000);
-}).catch(err => {console.log(err)});
+.then((result) => {
+    User.findOne().then(user => {
+        if(!user){
+            const user = new User({
+                username: 'SAI',
+                email: 'test@testing.com',
+                cart: {
+                    items: [],
+                }
+            });
+            user.save();
+        }
+        app.listen(3000);
+        console.log('DATABASE CONNECTED!');
+        console.log('USER CREATED.');
+    }).catch(err => {console.log(err)});
+});
