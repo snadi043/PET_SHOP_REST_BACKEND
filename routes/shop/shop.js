@@ -13,11 +13,11 @@ router.get('/products', shopController.getProducts);
 // // GET -> /product/id
 router.get('/products/:prodId', shopController.getProductById);
 
-// // GET -> /orders
-// router.get('/orders', shopController.getOrders);
+// GET -> /orders
+router.get('/orders', shopController.getOrders);
 
-// // POST -> /orders
-// router.post('/create-order', shopController.postAddOrders);
+// POST -> /orders
+router.post('/create-order', shopController.postAddOrders);
 
 // GET -> /cart
 router.get('/cart', shopController.getCart);
