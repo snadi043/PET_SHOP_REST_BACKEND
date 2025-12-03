@@ -12,7 +12,8 @@ exports.getProducts = (req, res, next) => {
         res.render('admin/products', {
         prods: products,
         path: '/admin/products',
-        docTitle: 'Admin Products'
+        docTitle: 'Admin Products',
+        isLoggedIn: req.isLoggedIn,
     });
     }).catch(err => {console.log(err)});
 ;
@@ -24,8 +25,9 @@ exports.getAddProducts = (req, res, next) => {
         res.render('admin/edit-product', {
         path: '/admin/add-products',
         docTitle: 'Add Product Page',
-        editing: false
-    })
+        editing: false,
+        isLoggedIn: req.isLoggedIn,
+    });
     }).catch(err => {console.log(err)});
 }
 
@@ -72,6 +74,7 @@ exports.getEditProduct = (req, res, next) => {
             path: '/admin/edit-product',
             editing: editMode, // now this meta data can be accessed on the view template to dynamically alter the view based on the "editing" parameter value.
             product: product,
+            isLoggedIn: req.isLoggedIn,
         });
     }).catch(err => {console.log(err)});
 }
