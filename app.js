@@ -31,6 +31,7 @@ const mongoose = require('mongoose');
 // Importing all the routes in the application to register in the app.js file so that routing happens in an organized manner. 
 const adminProductRoutes = require('./routes/admin/admin-products');
 const shopRoutes = require('./routes/shop/shop');
+const authRoutes = require('./routes/auth/auth');
 
 // Importing the models to use them to create neccessary actions in the application.
 const User = require('./models/user');
@@ -66,6 +67,7 @@ app.use((req, res, next) => {
 // Congiruing all the routes to be registered with the express framework.
 app.use('/admin', adminProductRoutes);
 app.use(shopRoutes);
+app.use(authRoutes);
 app.use(errorController.getErrorPage);
 
 // Here, before syncing the data to the database, any associations between the datatables should be registered.
