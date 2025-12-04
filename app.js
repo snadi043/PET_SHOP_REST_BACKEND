@@ -20,6 +20,9 @@ const errorController = require('./controllers/error');
 // Importing the mongoose package to create the database connection.
 const mongoose = require('mongoose');
 
+// Importing the express session package in the application.
+const session = require('express-session'); 
+
 //Importing the models to build the association relationship between them in conjucion with the database interactions.
 // const Product = require('./models/product');
 // const Cart = require('./models/cart');
@@ -50,6 +53,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Configuring the body parser for the application requirements.
 app.use(bodyParser.urlencoded({extended: false}));
+
+// Configuring the sessions package to enable the usage of "sessions" concept in the application.
+app.use(session({
+    secret: 'how many years you want to live',
+    resave: false,
+    saveUninitialized: true,
+}));
 
 // This is the middleware function which gets triggered when the index page path is requested on the server.
 // app.use('/', (req, res, next) => {
