@@ -14,7 +14,12 @@ exports.postLogin = (req, res, next) => {
     // by doing which the value is neither editable because of the "secret Key" configuration on the session
     // which is hashed and cannot be modified nor deleted because for every new request a session is created and doesnot die.
     req.session.isLoggedIn = true;
-    res.redirect('/');
+    req.session.save((err) => {
+        console.log(err);
+        res.redirect('/');
+    }).catch(err => {
+        console.log(err);
+    });
 }
 
 exports.postLogout = (req, res, next) => {
