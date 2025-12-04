@@ -23,6 +23,12 @@ const mongoose = require('mongoose');
 // Importing the express session package in the application.
 const session = require('express-session'); 
 
+// Importing the connect-mongodb-session package.
+const MongoDBStore = require('connect-mongodb-session')(session);
+
+// Database connection string.
+const DB_URI = 'mongodb+srv://snadi043_db_user:ofa5A2r6E0OtnMSS@cluster0.ea85prw.mongodb.net/shop?appName=Cluster0';
+
 //Importing the models to build the association relationship between them in conjucion with the database interactions.
 // const Product = require('./models/product');
 // const Cart = require('./models/cart');
@@ -54,11 +60,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Configuring the body parser for the application requirements.
 app.use(bodyParser.urlencoded({extended: false}));
 
+// Enabling the store to connect with the mongodb database to store the session information. 
+const store = new MongoDBStore({
+    uri: DB_URI,
+    collection: 'sessions'
+})
 // Configuring the sessions package to enable the usage of "sessions" concept in the application.
 app.use(session({
     secret: 'how many years you want to live',
     resave: false,
     saveUninitialized: true,
+    store: store,
 }));
 
 // This is the middleware function which gets triggered when the index page path is requested on the server.
@@ -116,7 +128,7 @@ app.use(errorController.getErrorPage);
 // Configuring the application to listen to the port 3000 on the browser.
 
 
-mongoose.connect('mongodb+srv://snadi043_db_user:ofa5A2r6E0OtnMSS@cluster0.ea85prw.mongodb.net/shop?appName=Cluster0')
+mongoose.connect(DB_URI)
 .then((result) => {
     User.findOne().then(user => {
         if(!user){
