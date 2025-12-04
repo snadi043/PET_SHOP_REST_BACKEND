@@ -102,7 +102,7 @@ form {
 .mobile-nav__item a:active,
 .mobile-nav__item a:hover,
 .mobile-nav__item a.active {
-  background: #00695c;
+  background: #dd0004;
   color: white;
   border-radius: 3px;
 }
@@ -123,7 +123,7 @@ form {
 
 #side-menu-toggle:active,
 #side-menu-toggle:hover {
-  color: #ffeb3b;
+  color: #dd0004;
   border-color: #ffeb3b;
 }
 
@@ -184,8 +184,8 @@ form {
   padding: 0.25rem 1rem;
   text-decoration: none;
   font: inherit;
-  border: 1px solid #00695c;
-  color: #00695c;
+  border: 1px solid #dd0004;
+  color: #dd0004;
   background: white;
   border-radius: 3px;
   cursor: pointer;
@@ -193,7 +193,7 @@ form {
 
 .btn:hover,
 .btn:active {
-  background-color: #00695c;
+  background-color: #dd0004;
   color: white;
 }
 
