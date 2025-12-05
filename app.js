@@ -66,7 +66,7 @@ const store = new MongoDBStore({
     collection: 'sessions'
 })
 // Configuring the sessions package to enable the usage of "sessions" concept in the application.
-app.use(session({
+app.use(require('express-session')({
     secret: 'how many years you want to live',
     resave: false,
     saveUninitialized: true,
@@ -79,12 +79,12 @@ app.use(session({
 // });
 
 // Creating a middleware to manually log user into the application by injecting the user onto the request.
-app.use((req, res, next) => {
-    User.findById('692dad848b63e8870f83e1c6').then(user => {
-        req.user = user; // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
-        next();
-    }).catch(err => {console.log(err)});
-});
+// app.use((req, res, next) => {
+//     User.findById(req.session.user._id).then(user => {
+//         req.user = user; // This is the format using which you can add fields to the request "apart from already registered keywords in the request".
+//         next();
+//     }).catch(err => {console.log(err)});
+// });
 
 // Congiruing all the routes to be registered with the express framework.
 app.use('/admin', adminProductRoutes);
@@ -130,19 +130,7 @@ app.use(errorController.getErrorPage);
 
 mongoose.connect(DB_URI)
 .then((result) => {
-    User.findOne().then(user => {
-        if(!user){
-            const user = new User({
-                username: 'SAI',
-                email: 'test@testing.com',
-                cart: {
-                    items: [],
-                }
-            });
-            user.save();
-        }
-        app.listen(3000);
-        console.log('DATABASE CONNECTED!');
-        console.log('USER CREATED.');
+    app.listen(3000);
+    console.log('DATABASE CONNECTED!');
+    console.log('USER CREATED.');
     }).catch(err => {console.log(err)});
-});
