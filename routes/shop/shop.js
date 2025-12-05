@@ -4,6 +4,9 @@ const router = express.Router();
 
 const shopController = require('../../controllers/shop/shop');
 
+// Importing the routelock middleware to control the manual access of using the routes when user is unauthencticated.
+const routelock = require('../../middleware/route-lock');
+
 // // GET -> /
 router.get('/', shopController.getIndexPage);
 
@@ -14,18 +17,18 @@ router.get('/products', shopController.getProducts);
 router.get('/products/:prodId', shopController.getProductById);
 
 // GET -> /orders
-router.get('/orders', shopController.getOrders);
+router.get('/orders', routelock, shopController.getOrders);
 
 // POST -> /orders
-router.post('/create-order', shopController.postAddOrders);
+router.post('/create-order', routelock, shopController.postAddOrders);
 
 // GET -> /cart
-router.get('/cart', shopController.getCart);
+router.get('/cart', routelock, shopController.getCart);
 
 // POST -> /cart
-router.post('/cart', shopController.postCart);
+router.post('/cart', routelock, shopController.postCart);
 
 // POST -> /cart-delete-product
-router.post('/cart-delete-product', shopController.postDeleteProductFromCart);
+router.post('/cart-delete-product', routelock, shopController.postDeleteProductFromCart);
 
 module.exports = router;
