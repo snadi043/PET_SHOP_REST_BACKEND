@@ -28,3 +28,15 @@ exports.postLogout = (req, res, next) => {
         res.redirect('/');
     });
 }
+
+exports.getSignup = (req, res, next) => {
+    res.render('auth/signup', {
+        path: '/signup',
+        docTitle: 'Signup Page',
+        isLoggedIn: false
+    });
+}
+
+exports.postSignup = (req, res, next) => {
+    res.redirect('/login');
+}
