@@ -14,7 +14,6 @@ exports.getProducts = (req, res, next) => {
         prods: products,
         path: '/products',
         docTitle: 'All Products',
-        isLoggedIn: req.session.isLoggedIn
         });
     });
 }
@@ -28,7 +27,6 @@ exports.getProductById = (req, res, next) => {
             docTitle: product.title,
             path: '/products',
             product: product,
-            isLoggedIn: req.session.isLoggedIn,
         });
     }).catch((err) => {
         console.log(err);
@@ -44,7 +42,6 @@ exports.getIndexPage = (req, res, next) => {
         prods: products,
         path: '/',
         docTitle: 'Shop Page',
-        isLoggedIn: req.session.isLoggedIn,
         });
     }).catch(err => {console.log(err)});
 }
@@ -60,7 +57,6 @@ exports.getCart = (req, res, next) => {
             docTitle: 'Cart Page',
             path: '/cart',
             products: products,
-            isLoggedIn: req.session.isLoggedIn,
         });
     }).catch(err => {console.log(err)});
 }
@@ -89,7 +85,6 @@ exports.postCart = (req, res, next) => {
                 docTitle: 'Orders Page',
                 path: '/orders',
                 orders: orders,
-                isLoggedIn: req.session.isLoggedIn,
             });
         }).catch(err => {console.log(err)});
     }
@@ -115,7 +110,7 @@ exports.postCart = (req, res, next) => {
         // the new data into the model object and then save it in the orders collection. 
         const order = new Orders({
             userData: {
-                username: req.user.username,
+                email: req.user.email,
                 userId: req.user,
             },
             product: products

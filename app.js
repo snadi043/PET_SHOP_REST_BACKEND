@@ -8,6 +8,8 @@ const path = require('path');
 // Importing the body-parser package which is useful to read the data from the request body and use them in the application.
 const bodyParser = require('body-parser');
 
+const flash = require('connect-flash');
+
 // Importing the db utility module to create the connection with the database.
 // const sequelize = require('./utils/database');
 
@@ -43,10 +45,11 @@ const shopRoutes = require('./routes/shop/shop');
 const authRoutes = require('./routes/auth/auth');
 
 // Importing the models to use them to create neccessary actions in the application.
-const User = require('./models/user');
+// const User = require('./models/user');
 
 // Configuring the application to use express.
 const app = express();
+
 
 // Configuring the view engine for the application.
 app.set('view engine', 'ejs');
@@ -73,6 +76,14 @@ app.use(require('express-session')({
     store: store,
 }));
 
+app.use(flash());
+
+// Accessing the "locals" Object on the response to pass the "isLoggedIn" value to all the rendered "views". 
+app.use((req, res, next) => {
+    res.locals.isLoggedIn = req.session.isLoggedIn;
+    next();
+});
+
 // This is the middleware function which gets triggered when the index page path is requested on the server.
 // app.use('/', (req, res, next) => {
 //     res.redirect('/');
@@ -91,6 +102,8 @@ app.use('/admin', adminProductRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
 app.use(errorController.getErrorPage);
+
+
 
 // Here, before syncing the data to the database, any associations between the datatables should be registered.
 // Associations are the one of the important concepts in SEQUELIZE library.

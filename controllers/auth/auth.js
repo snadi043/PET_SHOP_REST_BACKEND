@@ -1,14 +1,25 @@
+const e = require('express');
 const User = require('../../models/user');
 
 // Importing the "bcrypt" package to validate the passwords.
 const bcrypt = require('bcryptjs');
 
+
 exports.getLogin = (req, res, next) => {
+    let errorMessage = req.flash('error');
+    console.log(errorMessage, 'getLoginerror');
+    if(errorMessage.length > 0){
+        errorMessage = errorMessage[0];
+    }
+    else{
+        errorMessage = null;
+    }
     // const isLoggedInValue = req.get('Cookie');
     res.render('auth/login', {
         docTitle: 'Login Page',
         path: '/login',
-        isLoggedIn: false, 
+        isLoggedIn: false,
+        errorMessage: errorMessage,
     });
 }
 
@@ -25,6 +36,7 @@ exports.postLogin = (req, res, next) => {
 
     User.findOne({email: email}).then(user => {
     if(!user){
+        req.flash('error', 'Invalid email or password');
         return res.redirect('/login')
     }
     bcrypt.compare(password, user.password)
@@ -53,10 +65,18 @@ exports.postLogout = (req, res, next) => {
 }
 
 exports.getSignup = (req, res, next) => {
+    let message = req.flash('error');
+    if(message.length > 0){
+        message = message[0];
+    }
+    else{
+        message = null;
+    }
     res.render('auth/signup', {
         path: '/signup',
         docTitle: 'Signup Page',
-        isLoggedIn: false
+        isLoggedIn: false,
+        errorMessage: message,
     });
 }
 
@@ -70,6 +90,7 @@ exports.postSignup = (req, res, next) => {
     User.findOne({email: email}).then(user => {
     // this is the case for the first time user
     if(user){
+        req.flash('error', 'E-mail already exists, Please try with a new email');
         return res.redirect('/singup');
     }
     // Hashing the password to overcome the security threats when dealing with sensitive data.

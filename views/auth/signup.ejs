@@ -6,6 +6,11 @@
 <%- include('../includes/navbar.ejs') %>
 
 <body>
+    <% if(errorMessage) { %>
+        <div class="centered">
+            <h1><%= errorMessage %></h1>
+        </div>
+    <% } %>
     <form class="signup-form" method="POST" action="/signup">
         <div class="form-control">
             <label for="email">Email</label>
