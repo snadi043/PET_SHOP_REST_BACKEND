@@ -1,13 +1,20 @@
-const e = require('express');
 const User = require('../../models/user');
 
 // Importing the "bcrypt" package to validate the passwords.
 const bcrypt = require('bcryptjs');
 
+// Importing the packages nodemailer nodemailer-sendgrid-transport to implement "Email System" in the application.
+const nodemailer = require('nodemailer');
+const nodemailerSendgridTransport = require('nodemailer-sendgrid-transport');
+
+const transport = nodemailer.createTransport(nodemailerSendgridTransport({
+    auth: {
+        api_key: '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',
+    }
+}));
 
 exports.getLogin = (req, res, next) => {
-    let errorMessage = req.flash('error');
-    console.log(errorMessage, 'getLoginerror');
+    let errorMessage = Array.isArray(req.flash('error'));
     if(errorMessage.length > 0){
         errorMessage = errorMessage[0];
     }
@@ -65,7 +72,7 @@ exports.postLogout = (req, res, next) => {
 }
 
 exports.getSignup = (req, res, next) => {
-    let message = req.flash('error');
+    let message = Array.isArray(req.flash('error'));
     if(message.length > 0){
         message = message[0];
     }
@@ -91,7 +98,7 @@ exports.postSignup = (req, res, next) => {
     // this is the case for the first time user
     if(user){
         req.flash('error', 'E-mail already exists, Please try with a new email');
-        return res.redirect('/singup');
+        return res.redirect('/signup');
     }
     // Hashing the password to overcome the security threats when dealing with sensitive data.
     return bcrypt.hash(password, 12).then(hashedPassword => {
@@ -100,7 +107,13 @@ exports.postSignup = (req, res, next) => {
         return user.save();
     }).then(result => {
         res.redirect('/login');
-    });
+        return transport.sendMail({
+            to: email,
+            from: 'shop@petshoponline.com',
+            subject: 'YOU HAVE SUCCESSFULLY CREATED ACCOUNT WITH US.',
+            html: '<h1>Sign up process successfully created.</h1>'
+        });
+    }).catch(err => {console.log(err)});
     }).catch(err => {
         console.log(err);
     });
