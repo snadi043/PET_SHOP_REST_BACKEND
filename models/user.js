@@ -114,6 +114,8 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  resetToken: String,
+  resetTokenExpiryTime: Date,
   cart:{
     items: [{
       productId: {

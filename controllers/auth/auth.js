@@ -3,6 +3,9 @@ const User = require('../../models/user');
 // Importing the "bcrypt" package to validate the passwords.
 const bcrypt = require('bcryptjs');
 
+// Crypto is the inbuilt node module to perform hashing functionality in the node application.
+const crypto = require('crypto');
+
 // Importing the packages nodemailer nodemailer-sendgrid-transport to implement "Email System" in the application.
 const nodemailer = require('nodemailer');
 const nodemailerSendgridTransport = require('nodemailer-sendgrid-transport');
@@ -116,5 +119,57 @@ exports.postSignup = (req, res, next) => {
     }).catch(err => {console.log(err)});
     }).catch(err => {
         console.log(err);
+    });
+}
+
+exports.getReset = (req, res, next) => {
+    let errorMessage = req.flash('error');
+
+    if(errorMessage.length > 0) {
+        errorMessage = errorMessage[0];
+    }
+    else{
+        errorMessage = null;
+    }
+    res.render('auth/reset', {
+        path: '/reset',
+        docTitle: 'Password Reset',
+        errorMessage: errorMessage,
+    });
+}
+
+exports.postReset = (req, res, next) => {
+    // crypto is the inbuilt node module to produce hashed text which can be used to authenticate the users with the email from the same application.
+    crypto.randomBytes(32, (err, buffer) => {
+        if(err){
+            return res.redirect('/reset');
+        }
+        const token = buffer.toString('hex');
+        User.findOne({email: req.body.email}).then(user => {
+            if(!user){
+                req.flash('error', 'No email found with the given email.');
+            }
+            res.redirect('/reset');
+            // Once user with the valid email address if found, set the user fields with the necessary information
+            // setting users resetToken and restTokenExpiryTime.
+            user.resetToken = token,
+            user.resetTokenExpiryTime = new Date.now() + 3600;
+            return user.save();
+            // Then send a email to the user to navigate back to the valid link of the application where the user can reset the password.
+            // The link then contains the crypto encrypted token which is also saved to the database.
+        }).then(result => {
+            res.rediect('/');
+            return transport.sendMail({
+                to: req.body.email,
+                from: 'shop@petshoponline.com',
+                subject: '<h1>Reset Password</h1>',
+                html: `
+                    <p>You have requested to reset your password for your "PET SHOP" account.</p>
+                    <p>Click the <a href="https://localhost:3000/reset/${token}">link</a> below to reset your password.</p>
+                `
+            });
+        }).catch(err => {
+        console.log(err);
+        });
     });
 }
