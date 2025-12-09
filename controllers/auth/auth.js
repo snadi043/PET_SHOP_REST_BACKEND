@@ -173,3 +173,61 @@ exports.postReset = (req, res, next) => {
         });
     });
 }
+
+exports.getNewPassword = (req, res, next) => {
+    let errorMessage = req.flash('error');
+
+    if(errorMessage.length > 0){
+        errorMessage = errorMessage[0];
+    }
+    else{
+        errorMessage = null;
+    }
+
+    // To create a new password, the user has to have a valid token.
+    // To get access to valid token in this action we passed the token in the query of the crypto link.
+    const resetToken = req.params.token;
+    // Any user with the valid token which is matched to perform reset action and with the token validity is only allowed to perform the new password creation action.
+    // So the below check on the "user" model verifies the conditions and for such a user only render the "new-password" page.
+    User.findOne({resetToken: resetToken, resetTokenExpiryTime: {$gt: new Date.now()}}).then(user => {
+        if(!user){
+            req.flash('error', 'Token is either invalid or expired.');
+        }
+        res.render('auth/new-password', {
+            docTitle: 'New Password',
+            path: '/new-password',
+            errorMessage: errorMessage,
+            userId: user._id.toString(),
+            resetToken: resetToken,
+        });
+    }).catch(err => {
+        console.log(err);
+    });
+}
+
+exports.postNewPassword = (req, res, next) => {
+    // In this controller action, the new password is to be updated back to the database.
+    // Before saving it to the database it has to be hasehd using bcrypt.
+    // Before hashing the password, the user has to be verified with the valid resetToken, exipryTime and userId.
+
+    // So first, it is necessary to access the values of userId, resetToken and expiryTime.
+    const updatedPassword = req.body.password;
+    const userId = req.body.userId;
+    const resetToken = req.body.resetToken;
+    let resetUser;
+
+    User.findOne({_id: userId, resetToken: resetToken, resetTokenExpiryTime: {$gt: Date.now()}})
+    .then(user => {
+        resetUser = user;
+        return bcrypt.hash(updatedPassword, 16);
+    }).then(hashedPassword => {
+        resetUser.password = hashedPassword;
+        resetUser.token = undefined;
+        resetUser.resetTokenExpiryTime = undefined;
+        return resetUser.save();
+    }).then(() => {
+        res.redirect('/login');
+    }).catch(err => {
+        console.log(err);
+    });
+}

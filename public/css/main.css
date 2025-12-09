@@ -17,6 +17,7 @@ main {
 
 .centered {
   text-align: center;
+  padding: 1rem;
 }
 
 form {
