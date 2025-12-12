@@ -3,6 +3,9 @@ const User = require('../../models/user');
 // Importing the "bcrypt" package to validate the passwords.
 const bcrypt = require('bcryptjs');
 
+// Importing the validator to respond on the request using the express-validator package.
+const {validationResult} = require('express-validator');
+
 // Crypto is the inbuilt node module to perform hashing functionality in the node application.
 const crypto = require('crypto');
 
@@ -87,6 +90,11 @@ exports.getSignup = (req, res, next) => {
         docTitle: 'Signup Page',
         isLoggedIn: false,
         errorMessage: message,
+        userEnteredValues: {
+            email: '',
+            password: '',
+            cpassword: ''
+        }
     });
 }
 
@@ -94,17 +102,23 @@ exports.postSignup = (req, res, next) => {
     // Extracting the values from the form over the "POST" method.
     const email = req.body.email;
     const password = req.body.password;
-    const cpassword = req.body.cpassword;
 
-    // If user already exists then navigate to login page.
-    User.findOne({email: email}).then(user => {
-    // this is the case for the first time user
-    if(user){
-        req.flash('error', 'E-mail already exists, Please try with a new email');
-        return res.redirect('/signup');
+    const error = validationResult(req);
+    if(!error.isEmpty()){
+        return res.status(422).render('auth/signup', {
+            path: '/signup',
+            docTitle: 'Signup Page',
+            errorMessage: error.errors[0].msg,
+            userEnteredValues: {
+                email: email,
+                password: password,
+                cpassword: req.body.cpassword,
+            }
+        });
     }
+
     // Hashing the password to overcome the security threats when dealing with sensitive data.
-    return bcrypt.hash(password, 12).then(hashedPassword => {
+    bcrypt.hash(password, 12).then(hashedPassword => {
     // Once, the password is hashed, it is then saved to the database along with the cart.
     const user = new User({email: email, password: hashedPassword, cart: {items: []}});
         return user.save();
@@ -117,9 +131,6 @@ exports.postSignup = (req, res, next) => {
             html: '<h1>Sign up process successfully created.</h1>'
         });
     }).catch(err => {console.log(err)});
-    }).catch(err => {
-        console.log(err);
-    });
 }
 
 exports.getReset = (req, res, next) => {
