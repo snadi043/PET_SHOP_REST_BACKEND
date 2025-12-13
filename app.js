@@ -103,7 +103,11 @@ app.use(shopRoutes);
 app.use(authRoutes);
 app.use(errorController.getErrorPage);
 
+app.use('/500', errorController.get500Page);
 
+app.use((error, req, res, next) => {
+    res.redirect('/500');
+});
 
 // Here, before syncing the data to the database, any associations between the datatables should be registered.
 // Associations are the one of the important concepts in SEQUELIZE library.

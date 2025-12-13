@@ -5,3 +5,11 @@ exports.getErrorPage = (req, res, next) => {
         isLoggedIn: req.isLoggedIn,
     });
 }
+
+exports.get500Page = (req, res, next) => {
+    res.status(500).render('500error', {
+        docTitle: 'Error',
+        path: '/500',
+        isLoggedIn: req.isLoggedIn,
+    });
+}

@@ -79,7 +79,11 @@ exports.postLogin = (req, res, next) => {
         console.log(err);   
         res.redirect('/login');
     });
-    }).catch(err => {console.log(err)});        
+    }).catch(err => {
+        const error = new Error(err);
+        error.statusCode = 500;
+        return next(error);
+    });
 }
 
 exports.postLogout = (req, res, next) => {
