@@ -33,6 +33,10 @@ exports.getLogin = (req, res, next) => {
         path: '/login',
         isLoggedIn: false,
         errorMessage: errorMessage,
+        userEnteredValues: {
+            email: '',
+            password: '',
+        },
     });
 }
 
@@ -47,10 +51,18 @@ exports.postLogin = (req, res, next) => {
     const email = req.body.email;
     const password = req.body.password;
 
+    const error = validationResult(req);
+
     User.findOne({email: email}).then(user => {
     if(!user){
         req.flash('error', 'Invalid email or password');
-        return res.redirect('/login')
+        return res.redirect('/login',{
+            userEnteredValues: {
+                email: email,
+                password: password,                
+            },
+            errorMessage: error.errors[0].msg,
+        });
     }
     bcrypt.compare(password, user.password)
     .then((isMatched) => {
@@ -62,7 +74,7 @@ exports.postLogin = (req, res, next) => {
                 res.redirect('/');
             });
         };
-        res.redirect('/login')
+        res.redirect('/login');
     }).catch(err => {
         console.log(err);   
         res.redirect('/login');
@@ -94,7 +106,8 @@ exports.getSignup = (req, res, next) => {
             email: '',
             password: '',
             cpassword: ''
-        }
+        },
+        errorValidation: [],
     });
 }
 
@@ -104,6 +117,7 @@ exports.postSignup = (req, res, next) => {
     const password = req.body.password;
 
     const error = validationResult(req);
+    // console.log('postSignup', error.errors.find(e => {console.log('error', e)}));
     if(!error.isEmpty()){
         return res.status(422).render('auth/signup', {
             path: '/signup',
@@ -113,7 +127,8 @@ exports.postSignup = (req, res, next) => {
                 email: email,
                 password: password,
                 cpassword: req.body.cpassword,
-            }
+            },
+            errorValidation: error.errors,
         });
     }
 

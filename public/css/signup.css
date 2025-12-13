@@ -4,3 +4,7 @@
     margin: auto;
     display: block;
 }
+
+.signup-form.input .invalid{
+    border: 1px solid 'red',
+}
