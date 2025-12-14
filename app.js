@@ -10,6 +10,9 @@ const bodyParser = require('body-parser');
 
 const flash = require('connect-flash');
 
+// Importing the "multer" package which is an multi form data handling mechanism package which extracts diiferent types of data from a form. 
+const multer = require('multer');
+
 // Importing the db utility module to create the connection with the database.
 // const sequelize = require('./utils/database');
 
@@ -50,7 +53,6 @@ const authRoutes = require('./routes/auth/auth');
 // Configuring the application to use express.
 const app = express();
 
-
 // Configuring the view engine for the application.
 app.set('view engine', 'ejs');
 
@@ -62,6 +64,27 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Configuring the body parser for the application requirements.
 app.use(bodyParser.urlencoded({extended: false}));
+
+// Using the diskStorage option in the multer package to have full control on storing the files to the destination path and the filename.
+const storage = multer.diskStorage({
+    destination: function (req, file, cb){
+        cb(null, 'uploads');
+    },
+    filename: function(req, file, cb) {
+        cb(null, Date.now() + '-' + file.filename);
+    }
+});
+
+const mimeType = function(cb, file, req){
+    if(file.mimeType === 'uploads/png' || file.mimeType === 'uploads/jpeg' || file.mimeType === 'uploads/jpg'){
+        cb(null, true);
+    }
+    else{
+        cb(null, false);
+    }
+}
+// Configuring multer to extract the data from the "image" input filed and store it in the "uploads" destination in the application directory.
+app.use(multer({storage: storage, mimeType: mimeType}).single('image'));
 
 // Enabling the store to connect with the mongodb database to store the session information. 
 const store = new MongoDBStore({
@@ -101,9 +124,9 @@ app.use((req, res, next) => {
 app.use('/admin', adminProductRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
+app.use('/500', errorController.get500Page);
 app.use(errorController.getErrorPage);
 
-app.use('/500', errorController.get500Page);
 
 app.use((error, req, res, next) => {
     res.redirect('/500');

@@ -6,14 +6,23 @@
 <%- include('../includes/navbar.ejs') %>
 
 <body>
-    <form class="product-form" type="submit" method="POST" action="/admin/<%if(editing){%>edit-product<%}else{%>add-products<%}%>">
+    <form class="product-form" 
+        type="submit" 
+        method="POST" 
+        action="/admin/<%if(editing){%>edit-product<%}else{%>add-products<%}%>"
+        enctype="multipart/form-data"
+        >
         <div class="form-control">
             <label class="form-control" for="prod_title">Title</label>
             <input type="text" id="prod_title" name="prod_title" value="<% if(editing) { %><%= product.title %> <%}%>" required/>
         </div>
         <div class="form-control">
-            <label class="form-control" for="prod_imageUrl">Image Url</label>
-            <input type="text" id="prod_imageUrl" name="prod_imageUrl" value="<% if(editing) { %><%= product.imageUrl %> <%}%>" required/>
+            <label class="form-control" for="prod_imageUrl">Image</label>
+            <input 
+                type="file" 
+                id="image" 
+                name="image" 
+                required/>
         </div>
         <div class="form-control">
             <label class="form-control" for="prod_price">Price</label>

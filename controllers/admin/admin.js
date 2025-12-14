@@ -32,10 +32,23 @@ exports.getAddProducts = (req, res, next) => {
 // // This is the middleware function which gets triggered when the "post" method for adding the products path is requested on the server.
 exports.postAddProducts = (req, res, next) => {
     const title = req.body.prod_title;
-    const imageUrl = req.body.prod_imageUrl;
+    const image = req.file;
     const price = req.body.prod_price;
     const description = req.body.prod_description;
-    
+
+    if(!imageUrl){
+        res.status(422).render('admin/edit-product', {
+            docTitle: 'Add Product',
+            path: '/admin/add-product',
+            product: {
+                title: title,
+                price: price,
+                description: description
+            },
+        });
+    }
+    const imageUrl = image.path;
+
     // Using the instance of the Product model to save an Object of the data to the "shop" collection as a single document.
     const product = new Product(
         {
@@ -50,7 +63,11 @@ exports.postAddProducts = (req, res, next) => {
         console.log('AddAdminProducts', product);
         res.redirect('/admin/products');
     })
-    .catch(err => {console.log(err)});
+    .catch(err => {
+        const error = new Error(err);
+        error.statusCode = 500;
+        return next(error);
+    });
 };
 
 // // This is the middleware function which gets triggered when the "get" method for editing the products path is requested on the server.
