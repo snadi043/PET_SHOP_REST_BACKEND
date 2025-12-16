@@ -71,6 +71,28 @@ form {
   color: #641204;
 }
 
+.pagination{
+  text-align: center;
+  color: #dd0004;
+  margin-top: 1rem;
+  padding: 0 2rem;
+
+}
+
+.pagination a{
+  text-decoration: none;
+  padding: 0.5rem;
+  color: #dd0004;
+  border: 1px solid #dd0004;
+}
+
+.pagination a:hover,
+.pagination a:active,
+.pagination a.active{
+  color: #FFFFFF;
+  background-color: #dd0004;
+}
+
 .mobile-nav {
   width: 30rem;
   height: 100vh;

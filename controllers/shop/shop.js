@@ -2,7 +2,7 @@ const Product = require('../../models/product');
 
 const Orders = require('../../models/orders');
 
-// const User = require('../../models/user');
+const ITEMS_PER_PAGE = 1;
 
 // // This is the middleware function which gets triggered when the "get" method for fetching all the products requested on the server.
 exports.getProducts = (req, res, next) => {
@@ -35,15 +35,36 @@ exports.getProductById = (req, res, next) => {
 
 // // This is the middleware function which gets triggered when the "get" method for rendering the a single product requested on the server.
 exports.getIndexPage = (req, res, next) => {
+    const page = +req.params.page || 1;
+    let totalItems;
     // Since the database methods are based on concepts of promises, here when using them it is expected to use the promise methods
     // like then() and catch() through which chaining can be made easy and readable.
-    Product.find().then(products => {
+    Product.find()
+    .countDocuments()
+    .then(totalDocuments => {
+        totalItems = totalDocuments;
+        return Product.find()
+            .skip((page - 1) * ITEMS_PER_PAGE) // skip() -> finalizes how many items has to be skipped from initial set of data to show on the next pages.
+            .limit(ITEMS_PER_PAGE) // limit() -> returns how many items has to be shown in each page.
+    })
+    .then(products => {
         res.render('shop/index', {
         prods: products,
         path: '/',
         docTitle: 'Shop Page',
+        totalItems: totalDocuments,
+        currentPage: page, // Defines which is the current page.
+        nextPage: page + 1, // Defines next page in the series of pages.
+        previousPage: page - 1,
+        lastPage: Math.ceil(totalItems / ITEMS_PER_PAGE),
+        hasNextPage: page * ITEMS_PER_PAGE < totalItems,
+        hasPreviousPage: page > 1,
         });
-    }).catch(err => {console.log(err)});
+    }).catch(err => {
+        const error = new Error(err);
+        error.statusCode = 500;
+        return next(error);
+    });
 }
 
 
@@ -120,5 +141,9 @@ exports.postCart = (req, res, next) => {
     .then(result => {
         req.user.clearCart();
         res.redirect('/orders');
-    }).catch(err => {console.log(err)});
+    }).catch(err => {
+        const error = new Error(err);
+        error.statusCode = 500;
+        return next(error);
+    });
 }
