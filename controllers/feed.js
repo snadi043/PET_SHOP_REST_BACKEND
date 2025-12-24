@@ -7,23 +7,33 @@ const {validationResult} = require('express-validator');
 const Post = require('../models/post');
 
 exports.getFeeds = (req, res, next) => {
-    Post.find().then(posts => {
-        if(!posts){
-            const error = new Error('Fetching Post failed');
-            error.statusCode = 404;
-            throw error;
-        }
-        res.status(200).json({
-            message: 'Successfully Fetched the Posts',
-            posts: posts
-        });
+    const currentPage = req.query.page || 1;
+    const perPage = 2;
+    let toalItems;
+    Post.find().countDocuments()
+    .then(count => {
+        toalItems = count;
+        return Post.find()
+        .skip((currentPage - 1) * perPage)
+        .limit(perPage);
+    })
+    .then(posts => {
+    if(!posts){
+        const error = new Error('Fetching Post failed');
+        error.statusCode = 404;
+        throw error;
+    }
+    res.status(200).json({
+        message: 'Successfully Fetched the Posts',
+        posts: posts
+    });
     }) 
     .catch(err => {
         if(!err.statusCode){
             err.statusCode = 500;
         }
         next(err);
-    });
+    });    
 }
 
 exports.getFeed = ((req, res, next) => {
@@ -115,6 +125,30 @@ exports.updatePost = (req, res, next) => {
         return post.save();
     }).then(result => {
         res.status(200).json({message: 'Updated Post Successfully', post: result});
+    })
+    .catch(err => {
+        if(!err.statusCode){
+            err.statusCode = 500;
+        }
+        next(err);
+    });
+}
+
+
+exports.deletePost = (req, res, next) => {
+    const postId = req.params.postId;
+    Post.findById(postId)
+    .then(post => {
+        if(!post){
+            const error = new Error('Unable to delete post');
+            error.statusCode = 422;
+            throw err;
+        }
+        deleteImage(post.imageUrl);
+        return Post.findByIdAndDelete(postId);
+    })
+    .then(result => {
+        res.status(200).json({message: 'Successfully Deleted the Post', post: result});
     })
     .catch(err => {
         if(!err.statusCode){
