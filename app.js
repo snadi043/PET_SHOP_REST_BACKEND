@@ -11,27 +11,15 @@ const multer = require('multer');
 const cors = require('cors');
 
 const feedRoutes = require('./routes/feed');
+const authRoutes = require('./routes/auth');
 
 const DB_URL = 'mongodb+srv://snadi043_db_user:ofa5A2r6E0OtnMSS@cluster0.ea85prw.mongodb.net/shop_posts?appName=Cluster0';
 
 const app = express();
 
-app.use(cors({origin: 'http://localhost:3000'}));
+app.use(cors());
 
 app.use(bodyParser.json());
-
-// Middleware to configure the necessary application server based settings to avoid interuptions while building the application.
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    if(req.method === 'OPTIONS'){
-        return res.sendStatus(200);
-    }
-    next();
-});
-
-app.use('/feed', feedRoutes);
 
 const fileFilter = (req, file, cb) => {
     if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/jpg' || file.mimetype === 'image/png'){
@@ -58,6 +46,21 @@ app.use(multer({
 }).single('image'));
 
 app.use('/public/images', express.static(path.join(__dirname, 'images')));
+
+// Middleware to configure the necessary application server based settings to avoid interuptions while building the application.
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if(req.method === 'OPTIONS'){
+        return res.sendStatus(200);
+    }
+    next();
+});
+
+app.use('/feed', feedRoutes);
+app.use('/auth', authRoutes);
+
 
 // This is the middleware function to catch the global errors in the application and returns custom error statusCode and error message.
 app.use((error, req, res, next) => {
