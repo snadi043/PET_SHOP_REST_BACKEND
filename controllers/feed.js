@@ -5,6 +5,7 @@ const path = require('path');
 const {validationResult} = require('express-validator');
 
 const Post = require('../models/post');
+const User = require('../models/users');
 
 exports.getFeeds = (req, res, next) => {
     const currentPage = req.query.page || 1;
@@ -72,22 +73,26 @@ exports.postFeed = (req, res, next) => {
         title: title,
         content: content,
         imageUrl: imageUrl,
-        creator: {
-            name: '$@!',
-        }
+        creator: req.userId,
     });
-    post.save().then((result) => {
-        console.log(result);
+    post.save().then(result => {
+        return User.findById(req.userId)
+    }).then(user => {
+            creator = user;
+            user.posts.push(post);
+            return user.save();
+        }).then(result => {
         res.status(201).json({
             message: 'Post created successfully',
-            post: result
+            post: post,
+            creator: { id: creator._id, name: creator.name}
+        });
     }).catch((err) => {
         if(!err.statusCode){
             err.statusCode = 500;
         }
         next (err);
         });
-    });
 }
 
 exports.updatePost = (req, res, next) => {
