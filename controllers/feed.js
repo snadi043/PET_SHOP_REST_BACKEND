@@ -2,6 +2,8 @@ const fs = require('fs');
 
 const path = require('path');
 
+const io = require('../socket');
+
 const {validationResult} = require('express-validator');
 
 const Post = require('../models/post');
@@ -59,30 +61,31 @@ exports.getFeed = async(req, res, next) => {
 
 exports.postFeed = async(req, res, next) => {
     const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        const error = new Error('Posting status failed.');
+        error.statusCode = 422;
+        throw error;
+    };
+    if(!req.file){
+        const error = new Error('No image provided');
+        error.statusCode = 422;
+        throw error;
+    }
+    const imageUrl = req.file.path;
+    const title = req.body.title;
+    const content = req.body.message;
+    const post = new Post({
+        title: title,
+        content: content,
+        imageUrl: imageUrl,
+        creator: req.userId,
+    });
     try{
-        if(!errors.isEmpty()){
-            const error = new Error('Posting status failed.');
-            error.statusCode = 422;
-            throw error;
-        };
-        if(!req.file){
-            const error = new Error('No image provided');
-            error.statusCode = 422;
-            throw error;
-        }
-        const imageUrl = req.file.path;
-        const title = req.body.title;
-        const content = req.body.message;
-        const post = new Post({
-            title: title,
-            content: content,
-            imageUrl: imageUrl,
-            creator: req.userId,
-        });
         await post.save();
         const user = await User.findById(req.userId);
         user.posts.push(post);
         await user.save();
+        io.getIO().emit('posts', {action: 'create', post: post});
         res.status(201).json({
             message: 'Post created successfully',
             post: post,
@@ -99,33 +102,33 @@ exports.postFeed = async(req, res, next) => {
 
 exports.updatePost = async(req, res, next) => {
     const postId = req.params.postId;
-    try{
-        const errors = validationResult(req);
-            if(!errors.isEmpty){
-                const error = new Error('Updating Post Failed');
-                error.statusCode = 422;
+    const errors = validationResult(req);
+        if(!errors.isEmpty){
+            const error = new Error('Updating Post Failed');
+            error.statusCode = 422;
+            throw error;
+        }
+        const title = req.body.title;
+        const content = req.body.content;
+        let imageUrl = req.body.image;
+        if(req.file){
+            imageUrl = req.file.path;
+        }
+        if(!imageUrl){
+            const error = new Error('No file picked');
+            error.statusCode = 422;
+            throw error;
+        }
+        const post = Post.findById(postId)
+            if(imageUrl !== post.imageUrl){
+                deleteImage(post.imageUrl);
+            }
+            if(!post){
+                const error = new Error('Unable to find the post');
+                error.statusCode = 404;
                 throw error;
             }
-            const title = req.body.title;
-            const content = req.body.content;
-            let imageUrl = req.body.image;
-            if(req.file){
-                imageUrl = req.file.path;
-            }
-            if(!imageUrl){
-                const error = new Error('No file picked');
-                error.statusCode = 422;
-                throw error;
-            }
-            const post = Post.findById(postId)
-                if(imageUrl !== post.imageUrl){
-                    deleteImage(post.imageUrl);
-                }
-                if(!post){
-                    const error = new Error('Unable to find the post');
-                    error.statusCode = 404;
-                    throw error;
-                }
+    try {
             post.title = title;
             post.imageUrl = imageUrl;
             post.content = content;
@@ -153,6 +156,7 @@ exports.deletePost = async(req, res, next) => {
         deleteImage(post.imageUrl);
         await Post.findByIdAndDelete(postId);
     const result = await res.status(200).json({message: 'Successfully Deleted the Post', post: result});
+
     }
     catch(err){
         if(!err.statusCode){

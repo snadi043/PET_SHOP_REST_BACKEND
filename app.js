@@ -72,6 +72,10 @@ app.use((error, req, res, next) => {
 mongoose.connect(DB_URL)
     .then(result => {
         console.log('DATABASE CONNECTED.');
-        app.listen(8080);
+        const server = app.listen(8080);
+        const io = require('./socket').init(server);
+        io.on('connection', (socket) => {
+            console.log('Client Connected.')
+        });
     })
     .catch(err => {console.log('DATABASE ERROR', err)});
