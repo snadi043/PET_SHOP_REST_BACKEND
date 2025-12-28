@@ -10,8 +10,13 @@ const multer = require('multer');
 
 const cors = require('cors');
 
-const feedRoutes = require('./routes/feed');
-const authRoutes = require('./routes/auth');
+const grahpqlResolver = require('./graphql/resolvers');
+const grahpqlSchema = require('./graphql/schema');
+
+const { graphqlHTTP } = require('express-graphql');
+
+// const feedRoutes = require('./routes/feed');
+// const authRoutes = require('./routes/auth');
 
 const DB_URL = 'mongodb+srv://snadi043_db_user:ofa5A2r6E0OtnMSS@cluster0.ea85prw.mongodb.net/shop_posts?appName=Cluster0';
 
@@ -47,20 +52,14 @@ app.use(multer({
 
 app.use('/public/images', express.static(path.join(__dirname, 'images')));
 
-// Middleware to configure the necessary application server based settings to avoid interuptions while building the application.
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    if(req.method === 'OPTIONS'){
-        return res.sendStatus(200);
-    }
-    next();
-});
+// app.use('/auth', authRoutes);
+// app.use('/feed', feedRoutes);
 
-app.use('/feed', feedRoutes);
-app.use('/auth', authRoutes);
-
+app.use(graphqlHTTP({
+    schema: grahpqlSchema,
+    rootValue: grahpqlResolver,
+    graphiql: true
+}));
 
 // This is the middleware function to catch the global errors in the application and returns custom error statusCode and error message.
 app.use((error, req, res, next) => {
@@ -72,10 +71,6 @@ app.use((error, req, res, next) => {
 mongoose.connect(DB_URL)
     .then(result => {
         console.log('DATABASE CONNECTED.');
-        const server = app.listen(8080);
-        const io = require('./socket').init(server);
-        io.on('connection', (socket) => {
-            console.log('Client Connected.')
-        });
+        app.listen(8080);
     })
     .catch(err => {console.log('DATABASE ERROR', err)});
