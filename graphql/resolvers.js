@@ -45,6 +45,7 @@ module.exports = {
         if(existingUser){
             const error = new Error('An user with given email already exists.');
             error.statusCode = 422;
+            error.data = errors;
             throw error;
         }
         // Also, in the process of creating a new user, dealing with the passwords are also important concept.

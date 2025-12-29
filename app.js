@@ -14,6 +14,7 @@ const grahpqlResolver = require('./graphql/resolvers');
 const grahpqlSchema = require('./graphql/schema');
 
 const { graphqlHTTP } = require('express-graphql');
+const { message } = require('statuses');
 
 // const feedRoutes = require('./routes/feed');
 // const authRoutes = require('./routes/auth');
@@ -58,7 +59,16 @@ app.use('/public/images', express.static(path.join(__dirname, 'images')));
 app.use(graphqlHTTP({
     schema: grahpqlSchema,
     rootValue: grahpqlResolver,
-    graphiql: true
+    graphiql: true,
+    customFormatErrorFn(error){
+        if(!error.originalError){
+            return err;
+        }
+        const data = error.originalError.data;
+        const code = error.originalError.statusCode || 500;
+        const message = error.message || 'An error occured.';
+        return {message: message, data: data, status: code};
+    }
 }));
 
 // This is the middleware function to catch the global errors in the application and returns custom error statusCode and error message.
