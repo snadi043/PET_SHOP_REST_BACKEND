@@ -10,11 +10,10 @@ const multer = require('multer');
 
 const cors = require('cors');
 
-const grahpqlResolver = require('./graphql/resolvers');
-const grahpqlSchema = require('./graphql/schema');
+const graphqlResolver = require('./graphql/resolvers');
+const graphqlSchema = require('./graphql/schema');
 
 const { graphqlHTTP } = require('express-graphql');
-const { message } = require('statuses');
 
 // const feedRoutes = require('./routes/feed');
 // const authRoutes = require('./routes/auth');
@@ -53,12 +52,21 @@ app.use(multer({
 
 app.use('/public/images', express.static(path.join(__dirname, 'images')));
 
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,PATCH,DELETE');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if(req.method === 'OPTIONS'){
+        return res.sendStatus(200);
+    }
+});
+
 // app.use('/auth', authRoutes);
 // app.use('/feed', feedRoutes);
 
-app.use(graphqlHTTP({
-    schema: grahpqlSchema,
-    rootValue: grahpqlResolver,
+app.use('/graphql', graphqlHTTP({
+    schema: graphqlSchema,
+    rootValue: graphqlResolver,
     graphiql: true,
     customFormatErrorFn(error){
         if(!error.originalError){
