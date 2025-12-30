@@ -126,6 +126,51 @@ module.exports = {
                     updatedAt: updatedPost.updatedAt.toISOString(),
                 };
         },
+
+        updatePost: async function({id, postInput}, req){
+            const isAuth = req.isAuth;
+            if(!isAuth){
+                const error = new Error('User not authenticated.');
+                error.statusCode = 422;
+                throw error;
+            }
+            const post = await Post.findById(id).populate('creator');
+            if(!post){
+                const error = new Error('Unable to find the Post trying to edit.');
+                error.statusCode = 401;
+                throw error;
+            }
+            if(post.creator._id.toString() !== req.userId.toString()){
+                const error = new Error('Invalid User');
+                error.statusCode = 402;
+                throw error;
+            }
+            const errors = [];
+            if(!validator.isEmpty(postInput.title) || !validator.isLength(postInput.title, {min: 5})){
+                errors.push({message: 'Title field is too short'});
+            };
+            if(!validator.isEmpty(postInput.content) || !validator.isLength(postInput.content, {min: 5})){
+                errors.push({message: 'Content field is too short'});
+            };
+            if(errors.length > 0){
+                const error = new Error('Invalid Input');
+                error.statusCode = 404;
+                throw error;
+            }
+            post.title = postInput.title;
+            post.content = postInput.content;
+            if(postInput.imageUrl !== 'undefined'){
+                post.imageUrl = postInput.imageUrl; 
+            }
+            const updatedPost = await post.save();
+            return { 
+                ...updatedPost._doc,
+                _id: updatedPost._id.toString(),
+                updatedAt: updatedPost.updatedAt.toString(),
+                createdAt: updatedPost.createdAt.toString(),
+            }
+        },
+
         posts: async function({page}, req){
             if(!page){
                 page = 1;
