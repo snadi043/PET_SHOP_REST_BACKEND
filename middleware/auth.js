@@ -3,9 +3,8 @@ const jwt = require('jsonwebtoken');
 module.exports = (req, res, next) => {
     const authorizationHeader = req.get('Authorization');
     if(!authorizationHeader){
-        const error = new Error('Unable to find Authorization Header');
-        error.statusCode = 401;
-        throw error;
+        req.isAuth = false;
+        return next();
     }
     const token = authorizationHeader.split(' ')[1];
     let decodedToken; 
@@ -13,14 +12,14 @@ module.exports = (req, res, next) => {
         decodedToken = jwt.verify(token, 'supersecretfortheapplication');
     }
     catch(err){
-        err.statusCode = 500;
-        throw err;
+        req.isAuth = false;
+        return next();
     }
     if(!decodedToken){
-        const error = new Error('Unable to verify the token');
-        error.statusCode = 401;
-        throw error;
+       req.isAuth = false;
+       return next();
     }
     req.userId = decodedToken.userId;
+    req.isAuth = true;
     next();
 }
