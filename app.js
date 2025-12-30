@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const path = require('path');
+const fs = require('fs');
 
 const multer = require('multer');
 
@@ -68,6 +69,26 @@ app.use((req, res, next) => {
 
 app.use(auth);
 
+app.put('/upload-image', (req, res, next) => {
+    const isAuth = req.auth;
+    if(!isAuth){
+        const error = new Error('User not authenticated');
+        error.statusCode = 401;
+        throw error;
+    }
+    const file = req.file;
+    // This is the condition which can handle the case of exisiting file re-write.
+    // So, if there is a file already and when tried to change it but not added a new change then this condition will cover the response.
+    if(!file){
+        return res.status(200).json({message: 'File not found'});
+    }
+    // If the file path exists already and user tries to upload a new file again. Firstly, it is required to clear the old file path.
+    if(req.body.oldPath){
+        deleteImage(req.body.oldPath);
+    }
+        return res.status(201).json({message: 'New file uploaded successfully.', filePath: req.file.path});
+});
+
 app.use('/graphql', graphqlHTTP({
     schema: graphqlSchema,
     rootValue: graphqlResolver,
@@ -89,6 +110,17 @@ app.use((error, req, res, next) => {
     const message = error.message;
     res.status(status).json({message: message, data: error.data});
 });
+
+// This is the function to handle the cleanup of the existing file when trying to add new files.
+const deleteImage = (filePath) => {
+    filePath = path.join(__dirname, '..', filePath);
+    fs.unlink(filePath, (err) => {
+        if(err){
+            throw err;
+        }
+        console.log(filePath, 'is deleted.');
+    });
+}
 
 mongoose.connect(DB_URL)
     .then(result => {

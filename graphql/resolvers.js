@@ -156,13 +156,24 @@ module.exports = {
             }
         },
 
-        getPost: async function(postId){
-            const post = await Post.findById(postId);
-            if(!post){
-                const error = new Error('Unable to find the post');
-                error.statusCode = 422;
+        getPost: async function({postId}, req){
+            const isAuth = req.isAuth;
+            if(!isAuth){
+                const error = new Error('User not authenticated');
+                error.statusCode = 401;
                 throw error;
             }
-            return { ...post._doc};
+            const post = await Post.findById(postId).populate('creator');
+            if(!post){
+                const error = new Error('Unable to find the post');
+                error.statusCode = 404;
+                throw error;
+            }
+            return { 
+                ...post._doc, 
+                _id: post._id.toString(), 
+                createdAt: post.createdAt.toISOString(),
+                updatedAt: post.updatedAt.toISOString()    
+            };
         }
     }
