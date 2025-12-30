@@ -23,7 +23,20 @@ const validator = require('validator');
 // Importing the "jsonwebtoken" to sign the "token" and validate the user to then pass it with all the request over the graphql queries to establish authentication.
 const jwt = require('jsonwebtoken');
 
+const path = require('path');
+const fs = require('fs');
+
 const isAuth = require('../middleware/auth');
+
+const deleteImage = (filePath) => {
+    filePath = path.join(__dirname, '..', filePath);
+    fs.unlink(filePath, (err) => {
+        if(err){
+            throw err;
+        }
+        console.log(filePath, 'is deleted.');
+    });
+}
 
 module.exports = {
     // To access the input fields there is an args property in graphql or otherwise object destructring also works.
@@ -220,5 +233,30 @@ module.exports = {
                 createdAt: post.createdAt.toISOString(),
                 updatedAt: post.updatedAt.toISOString()    
             };
+        },
+        deletePost: async function({id}, req){
+            const isAuth = req.isAuth;
+            if(!isAuth){
+                const error = new Error('User not authenticated.');
+                error.statusCode = 422;
+                throw error;
+            }
+            const post = await Post.findById(id).populate('creator');
+            if(!post){
+                const error = new Error('Unable to find the post you want to delete.');
+                error.statusCode = 401;
+                throw error;
+            }
+            if(post.creator._id.toString() !== req.userId.toString()){
+                const error = new Error('User is not authorized to delete the post.');
+                error.statusCode = 402;
+                throw error;
+            }
+            deleteImage(post.imageUrl);
+            await Post.findByIdAndDelete(id);
+            const user = await User.findById(req.userId);
+            user.posts.pull(id);
+            await user.save();
+            return true;
         }
     }
