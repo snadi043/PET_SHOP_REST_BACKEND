@@ -258,5 +258,43 @@ module.exports = {
             user.posts.pull(id);
             await user.save();
             return true;
+        },
+        user: async function (args, req){
+            const isAuth = req.isAuth;
+            if(!isAuth){
+                const error = new Error('User not authenticated');
+                error.statusCode = 422;
+                throw error;
+            }
+            const user = await User.findById(req.userId);
+            if(!user){
+                const error = new Error('Unable to find the user.');
+                error.statusCode = 401;
+                throw error;
+            }
+            return {
+                ...user._doc, 
+                _id: user._id.toISOString()
+            }
+        },
+        updateStatus: async function ({status}, req){
+            const isAuth = req.isAuth;
+            if(!isAuth){
+                const error = new Error('User not authenticated');
+                error.statusCode = 422;
+                throw error;
+            }
+            const user = await User.findById(req.userId);
+            if(!user){
+                const error = new Error('Unable to find the user.');
+                error.statusCode = 401;
+                throw error;
+            }
+            user.status = status;
+            await user.save();
+            return {
+                ...user._doc,
+                _id: user._id.toISOString
+            }
         }
     }
