@@ -1,3 +1,8 @@
+// Load environment variables from .env file
+const dotenv = require('dotenv');
+
+dotenv.config();
+
 const express = require('express');
 
 const mongoose = require('mongoose');
@@ -21,9 +26,18 @@ const auth = require('./middleware/auth');
 // const feedRoutes = require('./routes/feed');
 // const authRoutes = require('./routes/auth');
 
-const DB_URL = 'mongodb+srv://snadi043_db_user:ofa5A2r6E0OtnMSS@cluster0.ea85prw.mongodb.net/shop_posts?appName=Cluster0';
+const helmet = require('helmet');
+const compression = require('compression');
+const morgan = require('morgan');
+
+const DB_URL = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.ea85prw.mongodb.net/${process.env.MONGODB_DATABASE}?appName=Cluster0`;
 
 const app = express();
+
+app.use(helmet());
+app.use(compression());
+const logStream = fs.createWriteStream(path.join(__dirname, 'accesslogs.txt'), {flags: 'a'});
+app.use(morgan('combined', {stream: logStream}));
 
 app.use(cors());
 
@@ -122,9 +136,11 @@ const deleteImage = (filePath) => {
     });
 }
 
+console.log(process.env.environment);
+
 mongoose.connect(DB_URL)
     .then(result => {
         console.log('DATABASE CONNECTED.');
-        app.listen(8080);
+        app.listen(process.env.PORT || 3000);
     })
     .catch(err => {console.log('DATABASE ERROR', err)});
